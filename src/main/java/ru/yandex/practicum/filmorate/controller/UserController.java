@@ -56,7 +56,7 @@ public class UserController {
         log.info("Принят HTTP запрос на обновление пользователя: {}", newUser);
 
         if (newUser.getId() == null){
-            if(newUser.getEmail() != null) {
+            if (newUser.getEmail() != null) {
                 long newUserId = listOfUsers.values().stream()
                         .filter(user1 -> user1.getEmail().equals(newUser.getEmail()))
                         .map(User::getId)

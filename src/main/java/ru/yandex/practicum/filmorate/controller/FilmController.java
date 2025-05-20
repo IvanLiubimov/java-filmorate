@@ -18,12 +18,12 @@ public class FilmController {
     private Map<Long, Film> films = new HashMap<>();
 
     @GetMapping
-    public Collection<Film> getAllFilms(){
+    public Collection<Film> getAllFilms() {
         return films.values();
     }
 
     @PostMapping
-    public Film  createFilm (@RequestBody Film film) {
+    public Film  createFilm(@RequestBody Film film) {
         log.info("Получен HTTP запрос на создание фильма: {}", film);
         film.setId(generateId());
         if (film.getName().isEmpty() || film.getName().isBlank()) {
@@ -35,7 +35,8 @@ public class FilmController {
         LocalDate birthdayOfCinema = LocalDate.parse("1895-12-28");
         if (film.getReleaseDate().isBefore(birthdayOfCinema)) {
             throw new ConditionsNotMetException("Дата релиза — не раньше 28 декабря 1895 года");
-        } if (film.getDuration().isNegative()) {
+        }
+        if (film.getDuration().isNegative()) {
              throw new ConditionsNotMetException("Продолжительность фильма должна быть положительным числом");
         }
         films.put(film.getId(), film);
