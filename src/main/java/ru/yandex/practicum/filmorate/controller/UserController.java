@@ -19,27 +19,27 @@ public class UserController {
     private Map<Long, User> listOfUsers = new HashMap<>();
 
     @GetMapping
-    public Collection<User> getListOfUsers(){
+    public Collection<User> getListOfUsers() {
         return listOfUsers.values();
     }
 
     @PostMapping
-    public User createUser (@RequestBody User user){
+    public User createUser(@RequestBody User user) {
         log.info("Получен HTTP запрос на создание пользователя: {}", user);
         long userId = generateId();
         user.setId(userId);
         if (user.getName() == null) {
             user.setName(user.getLogin());
         }
-        if (user.getEmail().isEmpty() || !user.getEmail().contains("@")){
+        if (user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
             throw new ConditionsNotMetException("Имейл должен быть указан и содержать символ @");
         }
         boolean exists = listOfUsers.values().stream()
                 .anyMatch(user1 -> user1.getEmail().equals(user.getEmail()));
-        if (exists){
+        if (exists) {
             throw new DuplicatedDataException("Этот имейл уже используется");
         }
-        if (user.getLogin().isEmpty() || user.getLogin().isBlank() || user.getLogin().contains(" ")){
+        if (user.getLogin().isEmpty() || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
             throw new ConditionsNotMetException("логин не может быть пустым и содержать пробелы");
         }
 
@@ -55,7 +55,7 @@ public class UserController {
     public User editUser(@RequestBody User newUser) {
         log.info("Принят HTTP запрос на обновление пользователя: {}", newUser);
 
-        if (newUser.getId() == null){
+        if (newUser.getId() == null) {
             if (newUser.getEmail() != null) {
                 long newUserId = listOfUsers.values().stream()
                         .filter(user1 -> user1.getEmail().equals(newUser.getEmail()))
@@ -63,7 +63,7 @@ public class UserController {
                         .findFirst()
                         .orElse(0L);
                 newUser.setId(newUserId);
-                throw new ConditionsNotMetException( "Укажите либо Id либо имейл");
+                throw new ConditionsNotMetException ( "Укажите либо Id либо имейл");
             }
         }
         if (listOfUsers.containsKey(newUser.getId())) {
