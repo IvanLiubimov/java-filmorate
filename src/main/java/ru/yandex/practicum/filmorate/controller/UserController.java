@@ -44,7 +44,7 @@ public class UserController {
         }
 
         if (user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ConditionsNotMetException ("дата рождения не может быть в будущем");
+            throw new ConditionsNotMetException("дата рождения не может быть в будущем");
         }
         listOfUsers.put(userId, user);
         log.info("Успешно обработал HTTP запрос на создание пользователя: {}", user);
@@ -63,7 +63,7 @@ public class UserController {
                         .findFirst()
                         .orElse(0L);
                 newUser.setId(newUserId);
-                throw new ConditionsNotMetException ( "Укажите либо Id либо имейл");
+                throw new ConditionsNotMetException("Укажите либо Id либо имейл");
             }
         }
         if (listOfUsers.containsKey(newUser.getId())) {
