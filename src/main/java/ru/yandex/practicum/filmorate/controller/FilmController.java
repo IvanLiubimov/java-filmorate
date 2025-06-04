@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.exceptions.ErrorResponse;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -39,7 +41,7 @@ public class FilmController {
         } catch (ConditionsNotMetException e) {
             log.warn("Ошибка при добавлении фильма: {}", e.getMessage());
             String error = e.getMessage();
-            return ResponseEntity.badRequest().body(error);
+            return ResponseEntity.badRequest().body(new ErrorResponse(error));
         }
     }
 
@@ -71,7 +73,7 @@ public class FilmController {
         } catch (ConditionsNotMetException | NotFoundException e) {
             log.warn("Ошибка при обновлении фильма: {}", e.getMessage());
             String error = e.getMessage();
-            return ResponseEntity.badRequest().body(error);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(error));
         }
     }
 

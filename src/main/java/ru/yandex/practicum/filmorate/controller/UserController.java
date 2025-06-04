@@ -1,13 +1,12 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.ErrorResponse;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
-
-
-
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 
 import java.time.LocalDate;
@@ -28,15 +27,15 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<?>  createUser(@RequestBody User user) {
+    public ResponseEntity<?> createUser(@RequestBody User user) {
         log.info("Получен HTTP запрос на создание пользователя: {}", user);
         try {
             if (userEmailValidation(user) && userLoginValidation(user) && userBirthdayValidation(user) && !isEmailExists(user)) {
+                long userId = generateId();
+                user.setId(userId);
                 if (userNameValidation(user)) {
                     user.setName(user.getLogin());
                 }
-                long userId = generateId();
-                user.setId(userId);
                 users.put(userId, user);
                 log.info("Успешно обработал HTTP запрос на создание пользователя: {}", user);
                 return ResponseEntity.ok(user);
@@ -45,7 +44,7 @@ public class UserController {
         } catch (ConditionsNotMetException e) {
             log.warn("Ошибка при добавлении пользователя: {}", e.getMessage());
             String error = e.getMessage();
-            return ResponseEntity.badRequest().body(error);
+            return ResponseEntity.badRequest().body(new ErrorResponse(error));
         }
     }
 
@@ -69,12 +68,11 @@ public class UserController {
 
                 if (userEmailValidation(newUser)) {
                     oldUser.setEmail(newUser.getEmail());
-
                 }
                 if (userLoginValidation(newUser)) {
                     oldUser.setLogin(newUser.getLogin());
                 }
-                if (userNameValidation(newUser)) {
+                if (!userNameValidation(newUser)) {
                     oldUser.setName(newUser.getName());
                 }
                 if (userBirthdayValidation(newUser)) {
@@ -88,7 +86,7 @@ public class UserController {
         } catch (ConditionsNotMetException | NotFoundException e) {
             log.warn("Ошибка при обновлении пользователя: {}", e.getMessage());
             String error = e.getMessage();
-            return ResponseEntity.badRequest().body(error);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(error));
         }
     }
 
@@ -97,21 +95,21 @@ public class UserController {
                 .anyMatch(user1 -> user1.getEmail().equals(user.getEmail()))) {
             throw new ConditionsNotMetException("Такой имеил уже есть у одного из пользователей");
         }
-        return true;
+        return false;
     }
 
     private boolean userNameValidation(User user) {
         if (user.getName() == null || user.getName().isEmpty()) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     private boolean userEmailValidation(User user) {
         if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
             throw new ConditionsNotMetException("Имейл должен быть указан и содержать символ @");
         }
-        return false;
+        return true;
     }
 
     private boolean userLoginValidation(User user) {
