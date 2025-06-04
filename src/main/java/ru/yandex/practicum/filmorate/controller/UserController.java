@@ -1,13 +1,13 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
-import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
+
+
+
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 
 import java.time.LocalDate;
@@ -19,12 +19,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private Map<Long, User> Users = new HashMap<>();
+    private Map<Long, User> users = new HashMap<>();
 
     @GetMapping
     public Collection<User> getListOfUsers() {
         log.info("Получен HTTP запрос вывод списка пользователей");
-        return Users.values();
+        return users.values();
     }
 
     @PostMapping
@@ -37,7 +37,7 @@ public class UserController {
                 }
                 long userId = generateId();
                 user.setId(userId);
-                Users.put(userId, user);
+                users.put(userId, user);
                 log.info("Успешно обработал HTTP запрос на создание пользователя: {}", user);
                 return ResponseEntity.ok(user);
             }
@@ -56,16 +56,16 @@ public class UserController {
 
         try {
             if (newUser.getId() == null) {
-                long newUserId = Users.values().stream()
+                long newUserId = users.values().stream()
                         .filter(user1 -> user1.getEmail().equals(newUser.getEmail()))
                         .map(User::getId)
                         .findFirst()
                         .orElse(0L);
                 newUser.setId(newUserId);
             }
-            if (Users.containsKey(newUser.getId())) {
+            if (users.containsKey(newUser.getId())) {
                 log.trace("Пользователь найден");
-                User oldUser = Users.get(newUser.getId());
+                User oldUser = users.get(newUser.getId());
 
                 if (userEmailValidation(newUser)) {
                     oldUser.setEmail(newUser.getEmail());
@@ -92,8 +92,8 @@ public class UserController {
         }
     }
 
-    private boolean isEmailExists (User user) {
-        if (Users.values().stream()
+    private boolean isEmailExists(User user) {
+        if (users.values().stream()
                 .anyMatch(user1 -> user1.getEmail().equals(user.getEmail()))) {
             throw new ConditionsNotMetException("Такой имеил уже есть у одного из пользователей");
         }
@@ -121,14 +121,15 @@ public class UserController {
         return true;
     }
 
-    private boolean userBirthdayValidation(User user){
+    private boolean userBirthdayValidation(User user) {
         if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
             throw new ConditionsNotMetException("дата рождения не может быть в будущем");
         }
         return true;
     }
+
     private long generateId() {
-        long maxId = Users.keySet().stream()
+        long maxId = users.keySet().stream()
                 .mapToLong(id -> id)
                 .max()
                 .orElse(0);
