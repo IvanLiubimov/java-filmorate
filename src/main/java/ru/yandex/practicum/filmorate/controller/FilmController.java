@@ -75,28 +75,28 @@ public class FilmController {
         }
     }
 
-    private boolean filmNameValidation (Film film) {
+    private boolean filmNameValidation(Film film) {
         if (film.getName() == null || film.getName().isEmpty() || film.getName().isBlank()) {
             throw new ConditionsNotMetException("Название фильма не может быть пустым");
         }
         return true;
     }
 
-    private boolean filmDurationValidation (Film film) {
+    private boolean filmDurationValidation(Film film) {
         if (film.getDuration() == null || film.getDuration().isNegative()) {
             throw new ConditionsNotMetException("Продолжительность фильма должна быть положительным числом");
         }
         return true;
     }
 
-    private boolean filmDescriptionValidation (Film film) {
+    private boolean filmDescriptionValidation(Film film) {
         if (film.getDescription() == null || film.getDescription().length() > 200) {
             throw new ConditionsNotMetException("максимальная длина описания — 200 символов");
         }
         return true;
     }
 
-    private boolean filmReleaseDateValidation (Film film) {
+    private boolean filmReleaseDateValidation(Film film) {
         if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(birthdayOfCinema)) {
             throw new ConditionsNotMetException("Дата релиза — не раньше 28 декабря 1895 года");
         }

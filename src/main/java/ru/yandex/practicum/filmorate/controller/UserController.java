@@ -127,7 +127,6 @@ public class UserController {
         }
         return true;
     }
-
     private long generateId() {
         long maxId = Users.keySet().stream()
                 .mapToLong(id -> id)
