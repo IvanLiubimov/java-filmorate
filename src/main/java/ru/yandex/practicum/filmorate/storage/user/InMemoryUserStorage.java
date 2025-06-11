@@ -39,13 +39,6 @@ public class InMemoryUserStorage implements UserStorage{
             throw new ConditionsNotMetException("Данные пользователя не прошли валидацию");
         }
 
-
-    @Override
-    public void deleteUser(User user) {
-
-
-    }
-
     @Override
     public User updateUser(User newUser) {
 
