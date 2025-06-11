@@ -5,6 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,4 +19,8 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
+
+    private Map<Long, Film> likedFilms = new HashMap<>();
+
+    private Set<Long> friends = new HashSet<>();
 }
