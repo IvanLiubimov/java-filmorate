@@ -19,7 +19,7 @@ public class FilmService {
     private final UserStorage userStorage;
 
     public Film addLike(Long filmId, Long userId) {
-        if(isFilmHasLikeFromUser(filmId, userId)) {
+        if (isFilmHasLikeFromUser(filmId, userId)) {
             throw new ConditionsNotMetException("Фильму уже ставили лайк");
         }
         Film film = filmStorage.getFilmById(filmId);
@@ -30,7 +30,7 @@ public class FilmService {
     }
 
     public Film deleteLike(Long filmId, Long userId) {
-        if(isFilmHasLikeFromUser(filmId, userId)) {
+        if (isFilmHasLikeFromUser(filmId, userId)) {
             Film film = filmStorage.getFilmById(filmId);
             User user = userStorage.getUserById(userId);
             if (!film.getLikes().isEmpty()) {
@@ -53,7 +53,7 @@ public class FilmService {
         try {
             User user = userStorage.getUserById(userId);
             return user.getLikedFilms().containsKey(filmId); //ecли не лайкал то false
-        } catch (NotFoundException e){
+        } catch (NotFoundException e) {
             throw e;
         }
     }
