@@ -7,9 +7,8 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -72,6 +71,14 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NotFoundException("Фильм с id = " + filmId + " не найден");
         }
         return film;
+    }
+
+    @Override
+    public Collection<Film> getSortedFilms(Integer count) {
+        return films.values().stream()
+                .sorted(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()))
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
     private boolean filmNameValidation(Film film) {

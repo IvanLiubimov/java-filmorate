@@ -13,8 +13,9 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserStorage userStorage;
 
-    public void addFriend(User user, User friend) {
-        validateUsers(user, friend);
+    public void addFriend(Long id, long friendId) {
+        User user = userStorage.getUserById(id);
+        User friend = userStorage.getUserById(friendId);
         if (isFriend(user, friend)) {
             throw new ConditionsNotMetException("Пользователь c логином " + friend.getLogin()
                     + " уже в друзьях у пользователя c логином " + user.getLogin());
@@ -23,21 +24,42 @@ public class UserService {
         friend.getFriends().add(user.getId());
     }
 
-    public void deleteFriend(User user, User friend) {
-        validateUsers(user, friend);
+    public void deleteFriend(Long id, long friendId) {
+        User user = userStorage.getUserById(id);
+        User friend = userStorage.getUserById(friendId);
         user.getFriends().remove(friend.getId());
         friend.getFriends().remove(user.getId());
     }
 
-    public Collection<User> showMutualFriends(User user, User friend) {
-        validateUsers(user, friend);
+    public Collection<User> showMutualFriends(Long id, long friendId) {
+        User user = userStorage.getUserById(id);
+        User friend = userStorage.getUserById(friendId);
         return user.getFriends().stream()
                 .filter(friend.getFriends()::contains)
-                .map(id -> userStorage.getUserById(id))
+                .map(userId -> userStorage.getUserById(userId))
                 .collect(Collectors.toList());
     }
 
-    public Collection<User> showFriends(User user) {
+    public Collection<User> getListOfUsers() {
+        return userStorage.getListOfUsers();
+    }
+
+    public User getUser(Long userId) {
+        return userStorage.getUserById(userId);
+    }
+
+
+    public User createUser(User user) {
+        return userStorage.createUser(user);
+    }
+
+
+    public User editUser(User newUser) {
+        return userStorage.updateUser(newUser);
+    }
+
+    public Collection<User> showFriends(Long id) {
+        User user = userStorage.getUserById(id);
         return user.getFriends().stream()
                 .map(userStorage::getUserById)
                 .collect(Collectors.toList());
@@ -47,13 +69,6 @@ public class UserService {
         return user.getFriends().contains(friend.getId());
     }
 
-    private void validateUsers(User user, User friend) {
-        if (user == null || friend == null) {
-            throw new ConditionsNotMetException("Один или оба пользователя не указаны.");
-        }
-        if (user.getId() == null || friend.getId() == null) {
-            throw new ConditionsNotMetException("ID пользователя не может быть null.");
-        }
-    }
+
 }
 

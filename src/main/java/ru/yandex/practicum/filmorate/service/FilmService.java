@@ -19,20 +19,21 @@ public class FilmService {
     private final UserStorage userStorage;
 
     public Film addLike(Long filmId, Long userId) {
-        if (isFilmHasLikeFromUser(filmId, userId)) {
-            throw new ConditionsNotMetException("Фильму уже ставили лайк");
-        }
         Film film = filmStorage.getFilmById(filmId);
         User user = userStorage.getUserById(userId);
+        if (isFilmHasLikeFromUser(filmId, user)) {
+            throw new ConditionsNotMetException("Фильму уже ставили лайк");
+        }
+
         film.getLikes().add(user.getId());
         user.getLikedFilms().put(filmId, film);
         return film;
     }
 
     public Film deleteLike(Long filmId, Long userId) {
-        if (isFilmHasLikeFromUser(filmId, userId)) {
-            Film film = filmStorage.getFilmById(filmId);
-            User user = userStorage.getUserById(userId);
+        Film film = filmStorage.getFilmById(filmId);
+        User user = userStorage.getUserById(userId);
+        if (isFilmHasLikeFromUser(filmId, user)) {
             if (!film.getLikes().isEmpty()) {
                 film.getLikes().remove(filmId);
             }
@@ -43,19 +44,27 @@ public class FilmService {
     }
 
     public Collection<Film> tenMostPopular(Integer count) {
-        return filmStorage.getListOfFilms().stream()
-                .sorted(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()))
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.getSortedFilms(count);
     }
 
-    boolean isFilmHasLikeFromUser(Long filmId, Long userId) {
+    boolean isFilmHasLikeFromUser(Long filmId, User user) {
         try {
-            User user = userStorage.getUserById(userId);
             return user.getLikedFilms().containsKey(filmId); //ecли не лайкал то false
         } catch (NotFoundException e) {
             throw e;
         }
+    }
+
+    public Collection<Film> getAllFilms() {
+        return filmStorage.getListOfFilms();
+    }
+
+    public Film createFilm(Film film) {
+        return filmStorage.createFilm(film);
+    }
+
+    public Film update(Film newFilm) {
+        return filmStorage.updateFilm(newFilm);
     }
 
 
