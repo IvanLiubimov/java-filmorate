@@ -59,14 +59,14 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping ("/{id}/friends")
-    public Collection<User> showFriends (@PathVariable Long id) {
+    @GetMapping("/{id}/friends")
+    public Collection<User> showFriends(@PathVariable Long id) {
         User user = userStorage.getUserById(id);
         return userService.showFriends(user);
     }
 
-    @GetMapping ("/{id}/friends/common/{otherId}")
-    public Collection<User> showMutualFriends (@PathVariable Long id, @PathVariable Long otherId) {
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public Collection<User> showMutualFriends(@PathVariable Long id, @PathVariable Long otherId) {
         User user = userStorage.getUserById(id);
         User friend = userStorage.getUserById(otherId);
         return userService.showMutualFriends(user, friend);
