@@ -1,137 +1,72 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ErrorResponse;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
-    private Map<Long, User> users = new HashMap<>();
+    private final UserService userService;
 
     @GetMapping
     public Collection<User> getListOfUsers() {
-        log.info("Получен HTTP запрос вывод списка пользователей");
-        return users.values();
+        log.info("Получен HTTP запрос на получение всех пользователей");
+       return userService.getListOfUsers();
+
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUser(@PathVariable Long userId) {
+        log.info("Получен HTTP запрос на получение пользователя по id: {}", userId);
+        User user = userService.getUser(userId);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody User user) {
+    public User createUser(@RequestBody User user) {
         log.info("Получен HTTP запрос на создание пользователя: {}", user);
-        try {
-            if (userEmailValidation(user) && userLoginValidation(user) && userBirthdayValidation(user) && !isEmailExists(user)) {
-                long userId = generateId();
-                user.setId(userId);
-                if (userNameValidation(user)) {
-                    user.setName(user.getLogin());
-                }
-                users.put(userId, user);
-                log.info("Успешно обработал HTTP запрос на создание пользователя: {}", user);
-                return ResponseEntity.ok(user);
-            }
-            return ResponseEntity.badRequest().build();
-        } catch (ConditionsNotMetException e) {
-            log.warn("Ошибка при добавлении пользователя: {}", e.getMessage());
-            String error = e.getMessage();
-            return ResponseEntity.badRequest().body(new ErrorResponse(error));
-        }
+        return userService.createUser(user);
     }
 
     @PutMapping
-    public ResponseEntity<?> editUser(@RequestBody User newUser) {
-
+    public User editUser(@RequestBody User newUser) {
         log.info("Принят HTTP запрос на обновление пользователя: {}", newUser);
-
-        try {
-            if (newUser.getId() == null) {
-                long newUserId = users.values().stream()
-                        .filter(user1 -> user1.getEmail().equals(newUser.getEmail()))
-                        .map(User::getId)
-                        .findFirst()
-                        .orElse(0L);
-                newUser.setId(newUserId);
-            }
-            if (users.containsKey(newUser.getId())) {
-                log.trace("Пользователь найден");
-                User oldUser = users.get(newUser.getId());
-
-                if (userEmailValidation(newUser)) {
-                    oldUser.setEmail(newUser.getEmail());
-                }
-                if (userLoginValidation(newUser)) {
-                    oldUser.setLogin(newUser.getLogin());
-                }
-                if (!userNameValidation(newUser)) {
-                    oldUser.setName(newUser.getName());
-                }
-                if (userBirthdayValidation(newUser)) {
-                    oldUser.setBirthday(newUser.getBirthday());
-                }
-
-                log.info("Успешно обработал HTTP запрос на обновление пользователя: {}", newUser);
-                return ResponseEntity.ok(oldUser);
-            }
-            throw new NotFoundException("Пользователь с id = " + newUser.getId() + " не найден");
-        } catch (ConditionsNotMetException | NotFoundException e) {
-            log.warn("Ошибка при обновлении пользователя: {}", e.getMessage());
-            String error = e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(error));
-        }
+        return userService.editUser(newUser);
     }
 
-    private boolean isEmailExists(User user) {
-        if (users.values().stream()
-                .anyMatch(user1 -> user1.getEmail().equals(user.getEmail()))) {
-            throw new ConditionsNotMetException("Такой имеил уже есть у одного из пользователей");
-        }
-        return false;
+    @PutMapping("/{id}/friends/{friendId}")
+    public ResponseEntity<Void> addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        log.info("Получен HTTP запрос на добавление в друзья пользователем " + id + " пользователя " + friendId);
+        userService.addFriend(id, friendId);
+        return ResponseEntity.ok().build();
     }
 
-    private boolean userNameValidation(User user) {
-        if (user.getName() == null || user.getName().isEmpty()) {
-            return true;
-        }
-        return false;
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public ResponseEntity<Void> deleteFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        log.info("Получен HTTP запрос на удаление из друзей пользователем " + id + " пользователя " + friendId);
+        userService.deleteFriend(id, friendId);
+        return ResponseEntity.ok().build();
     }
 
-    private boolean userEmailValidation(User user) {
-        if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
-            throw new ConditionsNotMetException("Имейл должен быть указан и содержать символ @");
-        }
-        return true;
+    @GetMapping("/{id}/friends")
+    public Collection<User> showFriends(@PathVariable Long id) {
+        log.info("Получен HTTP запрос на показ друзей пользователем " + id);
+        return userService.showFriends(id);
     }
 
-    private boolean userLoginValidation(User user) {
-        if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            throw new ConditionsNotMetException("логин не может быть пустым и содержать пробелы");
-        }
-        return true;
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public Collection<User> showMutualFriends(@PathVariable Long id, @PathVariable Long otherId) {
+        log.info("Получен HTTP запрос на показ общих из друзей пользователем " + id + "  и пользователя " + otherId);
+        return userService.showMutualFriends(id, otherId);
     }
 
-    private boolean userBirthdayValidation(User user) {
-        if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ConditionsNotMetException("дата рождения не может быть в будущем");
-        }
-        return true;
-    }
-
-    private long generateId() {
-        long maxId = users.keySet().stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        maxId++;
-        return maxId;
-    }
 }
+
