@@ -12,4 +12,6 @@ public interface UserStorage {
     User updateUser(User user);
 
     User getUserById(Long id);
+
+    boolean isEmailExists(String email);
 }

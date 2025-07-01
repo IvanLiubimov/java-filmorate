@@ -6,8 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-
 import java.util.Collection;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -23,10 +23,11 @@ public class UserController {
 
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{userId}")
     public ResponseEntity<User> getUser(@PathVariable Long userId) {
         log.info("Получен HTTP запрос на получение пользователя по id: {}", userId);
-        User user = userService.getUser(userId);
+        Optional<User> optionalUser = userService.getUser(userId);
+        User user = optionalUser.get();
         return ResponseEntity.ok(user);
     }
 
@@ -46,6 +47,7 @@ public class UserController {
     public ResponseEntity<Void> addFriend(@PathVariable Long id, @PathVariable Long friendId) {
         log.info("Получен HTTP запрос на добавление в друзья пользователем " + id + " пользователя " + friendId);
         userService.addFriend(id, friendId);
+        log.info("HTTP запрос на добавление в друзья пользователем " + id + " пользователя " + friendId + "успешен");
         return ResponseEntity.ok().build();
     }
 
@@ -53,6 +55,7 @@ public class UserController {
     public ResponseEntity<Void> deleteFriend(@PathVariable Long id, @PathVariable Long friendId) {
         log.info("Получен HTTP запрос на удаление из друзей пользователем " + id + " пользователя " + friendId);
         userService.deleteFriend(id, friendId);
+        log.info("HTTP запрос на удаление из друзей пользователем " + id + " пользователя " + friendId + " успешен");
         return ResponseEntity.ok().build();
     }
 
