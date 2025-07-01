@@ -25,7 +25,7 @@ public class FilmService {
     }
 
     public Collection<Film> mostPopular(Integer count) {
-        return filmRepository.MostPopular(count);
+        return filmRepository.mostPopular(count);
     }
 
 

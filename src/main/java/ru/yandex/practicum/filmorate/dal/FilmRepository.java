@@ -11,9 +11,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Repository
 public class FilmRepository extends BaseRepository<Film> {
@@ -21,7 +19,7 @@ public class FilmRepository extends BaseRepository<Film> {
     private final FilmValidator filmValidator;
     FilmResultSetExtractor filmResultSetExtractor = new FilmResultSetExtractor();
 
-    private static final String FIND_ALL_FILMS= "SELECT f.*, " +
+    private static final String FIND_ALL_FILMS = "SELECT f.*, " +
             "       f.rating_id, " +
             "       fg.genre_id, " +
             "       g.name AS genre_name, " +
@@ -70,7 +68,7 @@ public class FilmRepository extends BaseRepository<Film> {
         jdbcTemplate.update(query, userId, filmId);
     }
 
-    public Collection<Film> MostPopular(Integer count) {
+    public Collection<Film> mostPopular(Integer count) {
         String query = """
                 SELECT f.id,
         f.name,
