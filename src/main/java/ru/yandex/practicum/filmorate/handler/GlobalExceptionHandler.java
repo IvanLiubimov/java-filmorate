@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.handler;
 
 import jakarta.validation.ValidationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
