@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -20,7 +19,7 @@ public class UserRepository extends BaseRepository<User> {
 
     private final UserValidator userValidator;
 
-    private static final String FIND_ALL_USERS= "SELECT * FROM users";
+    private static final String FIND_ALL_USERS = "SELECT * FROM users";
     private static final String CREATE_USER = "INSERT INTO users(name, login, email, birthday) " + "VALUES (?, ?, ?, ?)";
     private static final String FIND_USER_BY_ID = "SELECT * FROM users WHERE id = ?";
     private static final String UPDATE_USER = "UPDATE users SET  email = ?, login = ?, name = ?, birthday = ?  WHERE id = ?";
