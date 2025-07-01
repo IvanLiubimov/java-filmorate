@@ -19,6 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RatingController {
     private final RatingService ratingService;
+
     @GetMapping
     public Collection<Rating> getAllRatings() {
         log.info("Получен HTTP запрос вывод списка рэйтингов");
