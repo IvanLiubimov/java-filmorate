@@ -26,8 +26,7 @@ public class UserController {
     @GetMapping("/{userId}")
     public ResponseEntity<User> getUser(@PathVariable Long userId) {
         log.info("Получен HTTP запрос на получение пользователя по id: {}", userId);
-        Optional<User> optionalUser = userService.getUser(userId);
-        User user = optionalUser.get();
+        User user = userService.getUser(userId);
         return ResponseEntity.ok(user);
     }
 

@@ -20,11 +20,11 @@ public class RatingService {
         return ratingRepository.findAllRating();
     }
 
-    public Optional<Rating> getRating(Integer ratingId) {
+    public Rating getRating(Integer ratingId) {
         Optional<Rating> ratingOpt = ratingRepository.getRatingById(ratingId);
         if (ratingOpt.isEmpty()) {
             throw new NotFoundException("Invalid rating id: " + ratingId);
         }
-        return ratingOpt;
+        return ratingOpt.get();
     }
 }

@@ -24,12 +24,8 @@ public class FilmService {
     }
 
     public void addLike(Long filmId, Long userId) {
-        if (!filmValidator.filmExists(filmId)) {
-            throw new NotFoundException("Пользователь с id " + filmId + " не найден.");
-        }
-        if (!userValidator.userExists(userId)) {
-            throw new NotFoundException("Пользователь с id=" + userId + " не найден");
-        }
+        getFilmById(filmId);
+        userValidator.userExists(userId);
         filmRepository.addLike(userId, filmId);
     }
 
@@ -59,9 +55,7 @@ public class FilmService {
     }
 
     public Film update(Film newFilm) {
-        if (!filmValidator.filmExists(newFilm.getId())) {
-            throw new NotFoundException("Пользователь с id " + newFilm.getId() + " не найден.");
-        }
+
         filmValidator.validate(newFilm);
         return filmRepository.updateFilm(newFilm);
     }

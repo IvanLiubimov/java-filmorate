@@ -65,8 +65,9 @@ public class UserService {
         return userRepository.getListOfUsers();
     }
 
-    public Optional<User> getUser(Long userId) {
-        return userRepository.getUserById(userId);
+    public User getUser(Long userId) {
+        return userRepository.getUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Фильм с id " + userId + " не найден."));
     }
 
 

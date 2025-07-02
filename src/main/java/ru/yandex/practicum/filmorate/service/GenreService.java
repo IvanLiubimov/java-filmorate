@@ -19,11 +19,11 @@ public class GenreService {
         return genreRepository.findAllGenres();
     }
 
-    public Optional<Genre> getGenre(int genreId) {
+    public Genre getGenre(int genreId) {
         Optional<Genre> genreOpt = genreRepository.getGenreById(genreId);
         if (genreOpt.isEmpty()) {
             throw new NotFoundException("Invalid genre id: " + genreId);
         }
-        return genreOpt;
+        return genreOpt.get();
     }
 }

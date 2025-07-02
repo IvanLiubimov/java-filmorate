@@ -29,8 +29,7 @@ public class RatingController {
     @GetMapping("/{ratingId}")
     public ResponseEntity<Rating> getRating(@PathVariable Integer ratingId) {
         log.info("Получен HTTP запрос на получение рэйтинга по id: {}", ratingId);
-        Optional<Rating> optionalRating = ratingService.getRating(ratingId);
-        Rating rating = optionalRating.get();
+        Rating rating = ratingService.getRating(ratingId);
         return ResponseEntity.ok(rating);
     }
 }

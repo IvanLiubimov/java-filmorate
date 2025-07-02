@@ -32,8 +32,7 @@ public class GenreController {
     @GetMapping("/{genreId}")
     public ResponseEntity<Genre> getGenre(@PathVariable int genreId) {
         log.info("Получен HTTP запрос на получение жанра по id: {}", genreId);
-        Optional<Genre> optionalGenre = genreService.getGenre(genreId);
-        Genre genre = optionalGenre.get();
+        Genre genre = genreService.getGenre(genreId);
         return ResponseEntity.ok(genre);
     }
 }
