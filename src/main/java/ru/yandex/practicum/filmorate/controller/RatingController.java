@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.service.RatingService;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @Slf4j
 @RestController

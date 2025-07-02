@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
