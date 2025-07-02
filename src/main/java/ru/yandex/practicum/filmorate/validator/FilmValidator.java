@@ -10,7 +10,11 @@ import java.time.LocalDate;
 @Component
     public class FilmValidator {
 
-    JdbcTemplate jdbcTemplate = new JdbcTemplate();
+    JdbcTemplate jdbcTemplate;
+
+    public FilmValidator(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
         private static final LocalDate EARLIEST_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
@@ -27,6 +31,14 @@ import java.time.LocalDate;
             if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(EARLIEST_RELEASE_DATE)) {
                 throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1895 года");
             }
+
+
         }
+
+    public boolean filmExists(Long filmId) {
+        String sql = "SELECT COUNT(*) FROM films WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, filmId);
+        return count != null && count > 0;
+    }
 
     }

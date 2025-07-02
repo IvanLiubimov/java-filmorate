@@ -24,8 +24,7 @@ public class FilmController {
     @GetMapping ("{id}")
     public ResponseEntity<Film> getFilmById(@PathVariable Long id) {
         log.info("Получен HTTP запрос на получение фильма по id: {}", id);
-        Optional<Film> optionalFilm = filmService.getFilmById(id);
-        Film film = optionalFilm.get();
+        Film film = filmService.getFilmById(id);
         return ResponseEntity.ok(film);
     }
 

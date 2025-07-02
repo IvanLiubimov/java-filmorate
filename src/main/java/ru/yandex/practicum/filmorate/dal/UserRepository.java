@@ -16,17 +16,13 @@ import java.util.Optional;
 
 @Repository
 public class UserRepository extends BaseRepository<User> {
-
-    private final UserValidator userValidator;
-
     private static final String FIND_ALL_USERS = "SELECT * FROM users";
     private static final String CREATE_USER = "INSERT INTO users(name, login, email, birthday) " + "VALUES (?, ?, ?, ?)";
     private static final String FIND_USER_BY_ID = "SELECT * FROM users WHERE id = ?";
     private static final String UPDATE_USER = "UPDATE users SET  email = ?, login = ?, name = ?, birthday = ?  WHERE id = ?";
 
-    public UserRepository(JdbcTemplate jdbc, @Qualifier ("userMapper") RowMapper<User> mapper, UserValidator userValidator) {
+    public UserRepository(JdbcTemplate jdbc, @Qualifier ("userMapper") RowMapper<User> mapper) {
         super(jdbc, mapper);
-        this.userValidator = userValidator;
     }
 
     public Collection<User> getListOfUsers() {
@@ -34,10 +30,6 @@ public class UserRepository extends BaseRepository<User> {
     }
 
     public User createUser(User user) {
-        userValidator.validate(user);
-        if (isEmailExists(user.getEmail())) {
-            throw new ConditionsNotMetException("Такой имейл уже есть у одного из пользователей");
-        }
         long id = create(CREATE_USER,
                 user.getName(),
                 user.getEmail(),
@@ -48,7 +40,6 @@ public class UserRepository extends BaseRepository<User> {
     }
 
     public User updateUser(User user) {
-        userValidator.validate(user);
         update(UPDATE_USER,
                 user.getEmail(),
                 user.getLogin(),
@@ -64,9 +55,6 @@ public class UserRepository extends BaseRepository<User> {
     }
 
     public Collection<User> showFriends(Long id) {
-        if (!userExists(id)) {
-            throw new NotFoundException("Пользователь с id=" + id + " не найден");
-        }
         String query = "SELECT u.* FROM friendship f " +
                 "INNER JOIN users u ON f.friend_id = u.id " +
                 "WHERE f.user_id = ?";
@@ -74,17 +62,6 @@ public class UserRepository extends BaseRepository<User> {
     }
 
     public void addFriend(Long id, Long friendId) {
-        if (id.equals(friendId)) {
-            throw new ConditionsNotMetException("Нельзя добавить в друзья самого себя");
-        }
-
-        if (!userExists(id)) {
-            throw new NotFoundException("Пользователь с id=" + id + " не найден");
-        }
-        if (!userExists(friendId)) {
-            throw new NotFoundException("Пользователь с id=" + friendId + " не найден");
-        }
-
         String queryCheck = "SELECT count(*) FROM friendship WHERE user_id = ? AND friend_id = ?";
         Integer count = jdbcTemplate.queryForObject(queryCheck, Integer.class, id, friendId);
         if (count != null && count > 0) {
@@ -96,13 +73,6 @@ public class UserRepository extends BaseRepository<User> {
     }
 
     public void deleteFriend(Long id, long friendId) {
-        if (!userExists(id)) {
-            throw new NotFoundException("Пользователь с id=" + id + " не найден");
-        }
-        if (!userExists(friendId)) {
-            throw new NotFoundException("Пользователь с id=" + friendId + " не найден");
-        }
-
         String query = "DELETE FROM friendship WHERE user_id = ? AND friend_id = ?";
 
         jdbcTemplate.update(query, id, friendId);
@@ -117,17 +87,7 @@ public class UserRepository extends BaseRepository<User> {
         return jdbcTemplate.query(query, mapper, id, friendId);
     }
 
-    private boolean isEmailExists(String email) {
-        String sql = "SELECT COUNT(*) FROM users WHERE LOWER(email) = LOWER(?)";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
-        return count != null && count > 0;
-    }
 
-    private boolean userExists(Long userId) {
-        String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
-        return count != null && count > 0;
-    }
 
 }
 

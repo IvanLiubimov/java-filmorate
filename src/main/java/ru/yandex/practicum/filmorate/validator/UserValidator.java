@@ -1,14 +1,19 @@
 package ru.yandex.practicum.filmorate.validator;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.Collection;
 
     @Component
+    @RequiredArgsConstructor
     public class UserValidator {
+        protected final JdbcTemplate jdbcTemplate;
 
         public void validate(User user) {
             if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
@@ -30,5 +35,15 @@ import java.util.Collection;
 
         private boolean emailExists(User user, Collection<User> users) {
             return users.stream().anyMatch(u -> u.getEmail().equals(user.getEmail()));
+        }
+
+        public boolean userExists(Long userId) {
+            try {
+                String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
+                Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+                return count != null && count > 0;
+            } catch (NullPointerException e) {
+                throw new NotFoundException("Пользователь с id=" + userId + " не найден");
+            }
         }
     }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import ru.yandex.practicum.filmorate.dal.GenreRepository;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.Collection;
@@ -19,6 +20,10 @@ public class GenreService {
     }
 
     public Optional<Genre> getGenre(int genreId) {
-        return genreRepository.getGenreById(genreId);
+        Optional<Genre> genreOpt = genreRepository.getGenreById(genreId);
+        if (genreOpt.isEmpty()) {
+            throw new NotFoundException("Invalid genre id: " + genreId);
+        }
+        return genreOpt;
     }
 }

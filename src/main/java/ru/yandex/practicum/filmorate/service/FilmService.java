@@ -3,7 +3,10 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.validator.FilmValidator;
+import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.*;
 
@@ -11,16 +14,32 @@ import java.util.*;
 @RequiredArgsConstructor
 public class FilmService {
     private final FilmRepository filmRepository;
+    private final FilmValidator filmValidator;
+    private final UserValidator userValidator;
 
-    public Optional<Film> getFilmById(long filmId) {
-        return filmRepository.getFilmById(filmId);
+
+    public Film getFilmById(long filmId) {
+        return filmRepository.getFilmById(filmId)
+                .orElseThrow(() -> new NotFoundException("Фильм с id " + filmId + " не найден."));
     }
 
     public void addLike(Long filmId, Long userId) {
+        if (!filmValidator.filmExists(filmId)) {
+            throw new NotFoundException("Пользователь с id " + filmId + " не найден.");
+        }
+        if (!userValidator.userExists(userId)) {
+            throw new NotFoundException("Пользователь с id=" + userId + " не найден");
+        }
         filmRepository.addLike(userId, filmId);
     }
 
     public void deleteLike(Long filmId, Long userId) {
+        if (!filmValidator.filmExists(filmId)) {
+            throw new NotFoundException("Пользователь с id " + filmId + " не найден.");
+        }
+        if (!userValidator.userExists(userId)) {
+            throw new NotFoundException("Пользователь с id=" + userId + " не найден");
+        }
         filmRepository.deleteLike(filmId, userId);
     }
 
@@ -35,19 +54,17 @@ public class FilmService {
     }
 
     public Film createFilm(Film film) {
+        filmValidator.validate(film);
         return filmRepository.createFilm(film);
     }
 
     public Film update(Film newFilm) {
+        if (!filmValidator.filmExists(newFilm.getId())) {
+            throw new NotFoundException("Пользователь с id " + newFilm.getId() + " не найден.");
+        }
+        filmValidator.validate(newFilm);
         return filmRepository.updateFilm(newFilm);
     }
 
-   // boolean isFilmHasLikeFromUser(Long filmId, User user) {
-   //     try {
-   //         return user.getLikedFilms().containsKey(filmId); //ecли не лайкал то false
-   //     } catch (NotFoundException e) {
-   //         throw e;
-   //     }
-   // }
 
 }

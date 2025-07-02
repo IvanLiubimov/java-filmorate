@@ -8,15 +8,12 @@ import ru.yandex.practicum.filmorate.dal.mapper.FilmResultSetExtractor;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
 import java.util.Collection;
 import java.util.Optional;
 
 @Repository
 public class FilmRepository extends BaseRepository<Film> {
-
-    private final FilmValidator filmValidator;
     FilmResultSetExtractor filmResultSetExtractor = new FilmResultSetExtractor();
 
     private static final String FIND_ALL_FILMS = "SELECT f.*, " +
@@ -48,9 +45,8 @@ public class FilmRepository extends BaseRepository<Film> {
             "WHERE f.id = ?";
 
 
-    public FilmRepository(JdbcTemplate jdbcTemplate, @Qualifier("filmMapper") RowMapper mapper, FilmValidator filmValidator) {
+    public FilmRepository(JdbcTemplate jdbcTemplate, @Qualifier("filmMapper") RowMapper<Film> mapper) {
         super(jdbcTemplate, mapper);
-        this.filmValidator = filmValidator;
     }
 
 
@@ -100,7 +96,6 @@ public class FilmRepository extends BaseRepository<Film> {
     }
 
     public Film createFilm(Film film) {
-        filmValidator.validate(film);
         if (!isRatingValid(film.getRating().getId())) {
             throw new NotFoundException("Invalid rating id: " + film.getRating().getId());
         }
@@ -125,7 +120,6 @@ public class FilmRepository extends BaseRepository<Film> {
     }
 
     public Film updateFilm(Film newFilm) {
-        filmValidator.validate(newFilm);
         update(
                 UPDATE_QUERY,
                 newFilm.getName(),

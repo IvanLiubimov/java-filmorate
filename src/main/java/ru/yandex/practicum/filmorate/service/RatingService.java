@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import ru.yandex.practicum.filmorate.dal.RatingRepository;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.util.Collection;
@@ -16,10 +17,14 @@ public class RatingService {
     private final RatingRepository ratingRepository;
 
     public Collection<Rating> getListOfRating() {
-        return ratingRepository.findAllGenres();
+        return ratingRepository.findAllRating();
     }
 
     public Optional<Rating> getRating(Integer ratingId) {
-        return ratingRepository.getRatingById(ratingId);
+        Optional<Rating> ratingOpt = ratingRepository.getRatingById(ratingId);
+        if (ratingOpt.isEmpty()) {
+            throw new NotFoundException("Invalid rating id: " + ratingId);
+        }
+        return ratingOpt;
     }
 }
