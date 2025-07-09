@@ -2,68 +2,62 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.dal.FilmRepository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.validator.FilmValidator;
+import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class FilmService {
-    private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    private final FilmRepository filmRepository;
+    private final FilmValidator filmValidator;
+    private final UserValidator userValidator;
 
-    public Film addLike(Long filmId, Long userId) {
-        Film film = filmStorage.getFilmById(filmId);
-        User user = userStorage.getUserById(userId);
-        if (isFilmHasLikeFromUser(filmId, user)) {
-            throw new ConditionsNotMetException("Фильму уже ставили лайк");
+
+    public Film getFilmById(long filmId) {
+        return filmRepository.getFilmById(filmId)
+                .orElseThrow(() -> new NotFoundException("Фильм с id " + filmId + " не найден."));
+    }
+
+    public void addLike(Long filmId, Long userId) {
+        getFilmById(filmId);
+        userValidator.userExists(userId);
+        filmRepository.addLike(userId, filmId);
+    }
+
+    public void deleteLike(Long filmId, Long userId) {
+        if (!filmValidator.filmExists(filmId)) {
+            throw new NotFoundException("Пользователь с id " + filmId + " не найден.");
         }
-
-        film.getLikes().add(user.getId());
-        user.getLikedFilms().put(filmId, film);
-        return film;
-    }
-
-    public Film deleteLike(Long filmId, Long userId) {
-        Film film = filmStorage.getFilmById(filmId);
-        User user = userStorage.getUserById(userId);
-        if (isFilmHasLikeFromUser(filmId, user)) {
-            if (!film.getLikes().isEmpty()) {
-                film.getLikes().remove(filmId);
-            }
-            user.getLikedFilms().remove(filmId);
-            return film;
+        if (!userValidator.userExists(userId)) {
+            throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }
-        throw new NotFoundException("Фильм не был вами пролайкан");
+        filmRepository.deleteLike(filmId, userId);
     }
 
-    public Collection<Film> tenMostPopular(Integer count) {
-        return filmStorage.getSortedFilms(count);
+    public Collection<Film> mostPopular(Integer count) {
+        return filmRepository.mostPopular(count);
     }
 
-    boolean isFilmHasLikeFromUser(Long filmId, User user) {
-        try {
-            return user.getLikedFilms().containsKey(filmId); //ecли не лайкал то false
-        } catch (NotFoundException e) {
-            throw e;
-        }
-    }
+
 
     public Collection<Film> getAllFilms() {
-        return filmStorage.getListOfFilms();
+        return filmRepository.getAllFilms();
     }
 
     public Film createFilm(Film film) {
-        return filmStorage.createFilm(film);
+        filmValidator.validate(film);
+        return filmRepository.createFilm(film);
     }
 
     public Film update(Film newFilm) {
-        return filmStorage.updateFilm(newFilm);
+
+        filmValidator.validate(newFilm);
+        return filmRepository.updateFilm(newFilm);
     }
 
 

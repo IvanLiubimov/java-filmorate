@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -19,6 +20,13 @@ public class FilmController {
         return filmService.getAllFilms();
     }
 
+    @GetMapping ("{id}")
+    public ResponseEntity<Film> getFilmById(@PathVariable Long id) {
+        log.info("Получен HTTP запрос на получение фильма по id: {}", id);
+        Film film = filmService.getFilmById(id);
+        return ResponseEntity.ok(film);
+    }
+
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
         log.info("Получен HTTP запрос на создание фильма: {}", film);
@@ -32,27 +40,24 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public Film addLike(@PathVariable Long id,
+    public void addLike(@PathVariable Long id,
                                       @PathVariable Long userId) {
         log.info("Получен HTTP запрос на добавление лайка фильму пользователем: {} {}", id, userId);
-        return filmService.addLike(id, userId);
+        filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public Film deleteLike(@PathVariable Long id,
+    public void deleteLike(@PathVariable Long id,
                                       @PathVariable Long userId) {
         log.info("Получен HTTP запрос на удаление лайка фильма пользователем: {} {}", id, userId);
-        return filmService.deleteLike(id, userId);
+        filmService.deleteLike(id, userId);
     }
 
     @GetMapping("/popular")
     public Collection<Film> getMostPopular(@RequestParam(defaultValue = "10") Integer count) {
         log.info("Получен HTTP запрос на вывод списка популярных фильмов");
-        return filmService.tenMostPopular(count);
+        return filmService.mostPopular(count);
     }
-
-
-
 }
 
 

@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -14,7 +14,11 @@ import java.util.stream.Collectors;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     private Map<Long, Film> films = new HashMap<>();
-    private final LocalDate birthdayOfCinema = LocalDate.parse("1895-12-28");
+    private final FilmValidator filmValidator;
+
+    public InMemoryFilmStorage(FilmValidator filmValidator) {
+        this.filmValidator = filmValidator;
+    }
 
     @Override
     public Collection<Film> getListOfFilms() {
@@ -22,18 +26,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public Film createFilm(Film film) {
-        if (filmNameValidation(film) &&
-                filmDescriptionValidation(film) &&
-                filmDurationValidation(film) &&
-                filmReleaseDateValidation(film)) {
-
-            film.setId(generateId());
-            films.put(film.getId(), film);
-            log.info("Успешно обработал HTTP запрос на создание фильма: {}", film);
-            return film;
-        }
-        log.warn("Ошибка при создании фильма");
-        throw new ConditionsNotMetException("Данные фильма не прошли валидацию");
+        filmValidator.validate(film);
+        film.setId(generateId());
+        films.put(film.getId(), film);
+        log.info("Успешно обработал HTTP запрос на создание фильма: {}", film);
+        return film;
     }
 
     @Override
@@ -44,18 +41,11 @@ public class InMemoryFilmStorage implements FilmStorage {
             }
             if (films.containsKey(newFilm.getId())) {
                 Film oldFilm = films.get(newFilm.getId());
-                if (filmNameValidation(newFilm)) {
-                    oldFilm.setName(newFilm.getName());
-                }
-                if (filmReleaseDateValidation(newFilm)) {
-                    oldFilm.setReleaseDate(newFilm.getReleaseDate());
-                }
-                if (filmDescriptionValidation(newFilm)) {
-                    oldFilm.setDescription(newFilm.getDescription());
-                }
-                if (filmDurationValidation(newFilm)) {
-                    oldFilm.setDuration(newFilm.getDuration());
-                }
+                filmValidator.validate(newFilm);
+                oldFilm.setName(newFilm.getName());
+                oldFilm.setReleaseDate(newFilm.getReleaseDate());
+                oldFilm.setDescription(newFilm.getDescription());
+                oldFilm.setDuration(newFilm.getDuration());
                 log.info("Успешно обработал HTTP запрос на обновление фильма: {}", newFilm);
                 return newFilm;
             }
@@ -79,34 +69,6 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .sorted(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()))
                 .limit(count)
                 .collect(Collectors.toList());
-    }
-
-    private boolean filmNameValidation(Film film) {
-        if (film.getName() == null || film.getName().isEmpty() || film.getName().isBlank()) {
-            throw new ConditionsNotMetException("Название фильма не может быть пустым");
-        }
-        return true;
-    }
-
-    private boolean filmDurationValidation(Film film) {
-        if (film.getDuration() == null || film.getDuration().isNegative()) {
-            throw new ConditionsNotMetException("Продолжительность фильма должна быть положительным числом");
-        }
-        return true;
-    }
-
-    private boolean filmDescriptionValidation(Film film) {
-        if (film.getDescription() == null || film.getDescription().length() > 200) {
-            throw new ConditionsNotMetException("максимальная длина описания — 200 символов");
-        }
-        return true;
-    }
-
-    private boolean filmReleaseDateValidation(Film film) {
-        if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(birthdayOfCinema)) {
-            throw new ConditionsNotMetException("Дата релиза — не раньше 28 декабря 1895 года");
-        }
-        return true;
     }
 
     private long generateId() {
