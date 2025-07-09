@@ -146,7 +146,4 @@ public class FilmRepository extends BaseRepository<Film> {
 
         return count != null && count == 1;
     }
-
-
-
 }
