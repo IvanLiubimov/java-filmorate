@@ -81,7 +81,11 @@ public class UserController {
 	@DeleteMapping("/{userId}")
 	public ResponseEntity<User> deleteUser(@PathVariable Long userId) {
 		log.info("Получен HTTP запрос на получение пользователя по id: {}", userId);
-		User user = userService.getUser(userId);
-		return ResponseEntity.ok(user);
+		if (userService.deleteUser(userId)) {
+			log.info("Пользователь id:" + userId + "удален");
+			return ResponseEntity.ok().build();
+		}
+		log.info("Неудачная попытка удаления пользователя id:" + userId);
+		return ResponseEntity.notFound().build();
 	}
 }
