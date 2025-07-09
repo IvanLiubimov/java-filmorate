@@ -1,3 +1,4 @@
+```mermaid
 erDiagram
     USERS {
         int id PK
@@ -49,3 +50,4 @@ erDiagram
     FILMS ||--o{ FILMS_GENRES : has_genre
     GENRES ||--o{ FILMS_GENRES : includes
     RATING ||--o{ FILMS : rated
+```

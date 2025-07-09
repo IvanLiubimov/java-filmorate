@@ -86,9 +86,13 @@ public class UserRepository extends BaseRepository<User> {
     }
 
     public boolean deleteUser (Long userId) {
+    	String deleteFriendSql = "DELETE FROM friends WHERE user_id=? OR friend_id=?";
+    	jdbcTemplate.update(deleteFriendSql, userId, userId);
+    	
     	String deleteUserSql = "DELETE FROM users WHERE id=?";
     	jdbcTemplate.update(deleteUserSql, userId);
     	return !isUserExist(userId);
+    	
     }
     
     public boolean isUserExist (Long userId) {
