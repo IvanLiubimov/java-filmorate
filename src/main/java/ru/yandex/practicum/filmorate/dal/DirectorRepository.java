@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Repository
-public class DirectorRepository extends BaseRepository<Director>{
+public class DirectorRepository extends BaseRepository<Director> {
 
     public DirectorRepository(JdbcTemplate jdbcTemplate,  @Qualifier("directorMapper") RowMapper<Director> mapper) {
         super(jdbcTemplate, mapper);
@@ -45,7 +45,7 @@ public class DirectorRepository extends BaseRepository<Director>{
         return director;
     }
 
-    public void deleteDirector (Long id) {
+    public void deleteDirector(Long id) {
         String query = "DELETE FROM directors WHERE id = ?";
         jdbcTemplate.update(query, id);
     }
