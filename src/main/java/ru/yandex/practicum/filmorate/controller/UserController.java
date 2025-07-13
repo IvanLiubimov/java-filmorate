@@ -2,11 +2,18 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.ErrorResponse;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FeedService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -14,6 +21,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final FeedService feedService;
 
     @GetMapping
     public Collection<User> getListOfUsers() {
@@ -68,6 +76,33 @@ public class UserController {
         log.info("Получен HTTP запрос на показ общих из друзей пользователем " + id + "  и пользователя " + otherId);
         return userService.showMutualFriends(id, otherId);
     }
+
+    @GetMapping("/feed")
+    public Collection<FeedEvent> getAllFeed() {
+        log.info("Получен запрос на получение всей ленты событий");
+        return feedService.getAllFeed();
+    }
+
+    @GetMapping("/{userid}/feed")
+    public Collection<FeedEvent> getUserFeed(@PathVariable Long userid) {
+        log.info("Получен запрос на ленту пользователя с ID: {}", userid);
+        return feedService.getUserFeed(userid);
+    }
+
+    /*@GetMapping("/{id}/feed")
+    public Collection<FeedEvent> getUserFeedById(
+            @PathVariable(required = false) Long id) {
+
+        if (id == null) {
+            return Collections.emptyList();
+        }
+        return feedService.getUserFeed(id);
+    }*/
+
+
+
+
+
 
 }
 
