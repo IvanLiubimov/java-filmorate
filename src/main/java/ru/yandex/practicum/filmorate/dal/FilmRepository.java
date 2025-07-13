@@ -130,7 +130,8 @@ public class FilmRepository extends BaseRepository<Film> {
                     throw new NotFoundException("Invalid genre id: " + (genre != null ? genre.getId() : "null"));
                 }
             }
-        } if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+        }
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
             log.info("Создан фильм с id = {}. Проверяем режиссёров: {}", id, film.getDirectors());
             for (Director director : film.getDirectors()) {
                 if (director != null && director.getId() != null && isDirectorExists(director.getId())) {
