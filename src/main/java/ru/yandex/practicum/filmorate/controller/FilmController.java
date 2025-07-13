@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -27,8 +28,20 @@ public class FilmController {
         return ResponseEntity.ok(film);
     }
 
+    @GetMapping("/director/{directorId}")
+    public List<Film> getFilmsByDirector(
+            @PathVariable long directorId,
+            @RequestParam(defaultValue = "year") String sortBy) {
+        if (sortBy.equals("year")) {
+            return filmService.getFilmsByDirectorSortedByYears(directorId);
+        }
+        return filmService.getFilmsByDirectorSortedByLikes(directorId);
+    }
+
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
+        log.info("Тело запроса: {}", film);
+        log.info("Режиссёры из тела: {}", film.getDirectors());
         log.info("Получен HTTP запрос на создание фильма: {}", film);
         return filmService.createFilm(film);
     }

@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.DirectorService;
 
 import java.util.Collection;
@@ -19,7 +18,7 @@ public class DirectorController {
 
     @GetMapping // GET /directors - Список всех режиссёров
     public Collection<Director> getAllDirectors() {
-        log.info("Получен HTTP запрос вывод списка фильмов");
+        log.info("Получен HTTP запрос вывод списка режиссеров");
         return directorService.getAllDirectors();
     }
 
