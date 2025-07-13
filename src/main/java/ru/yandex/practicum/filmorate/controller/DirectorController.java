@@ -25,8 +25,8 @@ public class DirectorController {
     @GetMapping ("{id}")  // GET /directors/{id}- Получение режиссёра по id
     public ResponseEntity<Director> getlDirectorById(@PathVariable Long id) {
         log.info("Получен HTTP запрос на получение режиссера по id: {}", id);
-        Director Director = directorService.getDirectorById(id);
-        return ResponseEntity.ok(Director);
+        Director director = directorService.getDirectorById(id);
+        return ResponseEntity.ok(director);
     }
 
     @PostMapping // POST /directors - Создание режиссёра
