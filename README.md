@@ -20,7 +20,6 @@ erDiagram
         varchar name
     }
     FILMS_GENRES {
-        int id PK
         int film_id FK
         int genre_id FK
     }
