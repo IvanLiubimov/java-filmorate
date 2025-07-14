@@ -1,17 +1,22 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.Collection;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+<<<<<<< HEAD
 import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
+=======
+>>>>>>> 912a6aa (#4 добавлена функция удаления пользователя)
 import ru.yandex.practicum.filmorate.validator.UserValidator;
-
-import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
@@ -106,8 +111,15 @@ public class UserService {
         return count != null && count > 0;
     }
 
+<<<<<<< HEAD
     public Collection<Film> getRecommendedFilms(long userId) {
         userValidator.userExists(userId);
+=======
+	public void deleteUser(Long userId) {
+		userRepository.deleteUser(userId);
+	}
+
+>>>>>>> 912a6aa (#4 добавлена функция удаления пользователя)
 
         Collection<Film> recommendedFilms = userRepository.getRecommendedFilms(userId);
 

@@ -1,15 +1,29 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import java.util.Collection;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+<<<<<<< HEAD
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.Film;
+=======
+>>>>>>> 912a6aa (#4 добавлена функция удаления пользователя)
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FeedService;
 import ru.yandex.practicum.filmorate.service.UserService;
-import java.util.Collection;
 
 @Slf4j
 @RestController
@@ -73,6 +87,7 @@ public class UserController {
         return userService.showMutualFriends(id, otherId);
     }
 
+<<<<<<< HEAD
     @GetMapping("/{id}/feed")
     public Collection<FeedEvent> getUserFeed(@PathVariable("id") Long userId) {
         log.info("Получение ленты событий пользователя ID: {}", userId);
@@ -85,5 +100,12 @@ public class UserController {
         return userService.getRecommendedFilms(userId);
     }
 
+=======
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+		userService.deleteUser(id);
+		return ResponseEntity.ok().build();
+	}
+>>>>>>> 912a6aa (#4 добавлена функция удаления пользователя)
 }
 
