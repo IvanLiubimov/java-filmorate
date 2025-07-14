@@ -156,6 +156,15 @@ public class FilmRepository extends BaseRepository<Film> {
                 newFilm.getRating() != null ? newFilm.getRating().getId() : null,
                 newFilm.getId()
         );
+
+        jdbcTemplate.update("DELETE FROM films_directors WHERE film_id = ?", newFilm.getId());
+
+        if (newFilm.getDirectors() != null) {
+            for (Director director : newFilm.getDirectors()) {
+                jdbcTemplate.update("INSERT INTO films_directors (film_id, director_id) VALUES (?, ?)",
+                        newFilm.getId(), director.getId());
+            }
+        }
         return newFilm;
     }
 
@@ -229,7 +238,71 @@ public class FilmRepository extends BaseRepository<Film> {
         return count != null && count > 0;
     }
 
+    public List<Film> getFilmByDirector(String query) {
+        String sql = "SELECT f.*, " +
+                "f.rating_id, " +
+                "r.name AS rating_name, " +
+                "fg.genre_id, " +
+                "g.name AS genre_name, " +
+                "fdir.director_id, " +
+                "dir.name AS director_name, " +
+                "fl.user_id AS like_user_id " +
+                "FROM films f " +
+                "JOIN films_directors fd ON f.id = fd.film_id " +
+                "LEFT JOIN films_genres fg ON f.id = fg.film_id " +
+                "LEFT JOIN genres g ON fg.genre_id = g.genre_id " +
+                "LEFT JOIN rating r ON f.rating_id = r.id " +
+                "LEFT JOIN films_directors fdir ON f.id = fdir.film_id " +
+                "LEFT JOIN directors dir ON fdir.director_id = dir.id " +
+                "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
+                "WHERE dir.name ILIKE ? " +
+                "ORDER BY f.id;";
 
+        return jdbcTemplate.query(sql, new FilmResultSetExtractor(), "%" + query + "%");
+    }
 
+    public List<Film> getFilmByTitle(String query) {
+        String sql = "SELECT f.*, " +
+                "f.rating_id, " +
+                "r.name AS rating_name, " +
+                "fg.genre_id, " +
+                "g.name AS genre_name, " +
+                "fdir.director_id, " +
+                "dir.name AS director_name, " +
+                "fl.user_id AS like_user_id " +
+                "FROM films f " +
+                "LEFT JOIN films_genres fg ON f.id = fg.film_id " +
+                "LEFT JOIN genres g ON fg.genre_id = g.genre_id " +
+                "LEFT JOIN rating r ON f.rating_id = r.id " +
+                "LEFT JOIN films_directors fdir ON f.id = fdir.film_id " +
+                "LEFT JOIN directors dir ON fdir.director_id = dir.id " +
+                "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
+                "WHERE f.name ILIKE ? " +
+                "ORDER BY f.id;";
+
+        return jdbcTemplate.query(sql, new FilmResultSetExtractor(), "%" + query + "%");
+    }
+
+    public List<Film> searchAll(String query) {
+        String sql = "SELECT f.*, " +
+                "f.rating_id, " +
+                "r.name AS rating_name, " +
+                "fg.genre_id, " +
+                "g.name AS genre_name, " +
+                "fdir.director_id, " +
+                "dir.name AS director_name, " +
+                "fl.user_id AS like_user_id " +
+                "FROM films f " +
+                "LEFT JOIN films_genres fg ON f.id = fg.film_id " +
+                "LEFT JOIN genres g ON fg.genre_id = g.genre_id " +
+                "LEFT JOIN rating r ON f.rating_id = r.id " +
+                "LEFT JOIN films_directors fdir ON f.id = fdir.film_id " +
+                "LEFT JOIN directors dir ON fdir.director_id = dir.id " +
+                "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
+                "WHERE f.name ILIKE ? OR dir.name ILIKE ? " +
+                "ORDER BY f.id;";
+
+        return jdbcTemplate.query(sql, new FilmResultSetExtractor(), "%" + query + "%", "%" + query + "%");
+    }
 
 }
