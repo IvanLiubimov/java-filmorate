@@ -78,28 +78,29 @@ public class FilmRepository extends BaseRepository<Film> {
 
     public Collection<Film> mostPopular(Integer count) {
         String query = """
-                SELECT f.id,
-                f.name,
-                f.description,
-                f.releaseDate,
-                f.duration,
-                f.rating_id,
-                r.name AS rating_name,
-                fg.genre_id AS genre_id,
-                g.name AS genre_name,
-                fdir.director_id,
-                dir.name AS director_name,
-                fl.user_id AS like_user_id
-         FROM films f
-         LEFT JOIN films_genres AS fg ON f.id = fg.film_id
-         LEFT JOIN genres AS g ON fg.genre_id = g.genre_id
-         LEFT JOIN rating r ON f.rating_id = r.id
-         LEFT JOIN films_directors AS fdir ON f.id = fdir.film_id
-         LEFT JOIN directors AS dir ON fdir.director_id = dir.id
-         LEFT JOIN film_likes AS fl ON f.id = fl.film_id
-         GROUP BY f.id, fg.genre_id, g.name, r.name, fdir.director_id, dir.name, fl.user_id
-         ORDER BY COUNT(fl.user_id) DESC, f.id ASC
-         LIMIT ?
+        SELECT f.id,
+               f.name,
+               f.description,
+               f.releaseDate,
+               f.duration,
+               f.rating_id,
+               r.name AS rating_name,
+               fg.genre_id AS genre_id,
+               g.name AS genre_name,
+               fdir.director_id,
+               dir.name AS director_name,
+               COUNT(fl.user_id) AS like_count
+        FROM films f
+        LEFT JOIN films_genres AS fg ON f.id = fg.film_id
+        LEFT JOIN genres AS g ON fg.genre_id = g.genre_id
+        LEFT JOIN rating r ON f.rating_id = r.id
+        LEFT JOIN films_directors AS fdir ON f.id = fdir.film_id
+        LEFT JOIN directors AS dir ON fdir.director_id = dir.id
+        LEFT JOIN film_likes AS fl ON f.id = fl.film_id
+        GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id,
+                 r.name, fg.genre_id, g.name, fdir.director_id, dir.name
+        ORDER BY like_count DESC, f.id ASC
+        LIMIT ?
         """;
         return jdbcTemplate.query(query, filmResultSetExtractor, count);
     }
@@ -176,11 +177,9 @@ public class FilmRepository extends BaseRepository<Film> {
                 "LEFT JOIN directors dir ON fdir.director_id = dir.id " +
                 "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
                 "WHERE fd.director_id = ? " +
-                "ORDER BY ( " +
-                "    SELECT COUNT(*) " +
-                "    FROM film_likes fl2 " +
-                "    WHERE fl2.film_id = f.id " +
-                ") DESC";
+                "ORDER BY " +
+                "(SELECT COUNT(*) FROM film_likes fl2 WHERE fl2.film_id = f.id) DESC," +
+                "f.id ASC";
 
         return jdbcTemplate.query(querySortByLikes, new FilmResultSetExtractor(), directorId);
     }

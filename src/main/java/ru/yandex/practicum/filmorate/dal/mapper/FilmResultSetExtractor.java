@@ -75,6 +75,7 @@ public class FilmResultSetExtractor implements ResultSetExtractor<List<Film>> {
                     film.getDirectors().add(new Director(directorId, directorName));
                 }
             }
+
         }
         return new ArrayList<>(idToFilm.values());
     }
