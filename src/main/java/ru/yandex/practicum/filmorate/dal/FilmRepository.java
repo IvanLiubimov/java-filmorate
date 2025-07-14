@@ -156,6 +156,15 @@ public class FilmRepository extends BaseRepository<Film> {
                 newFilm.getRating() != null ? newFilm.getRating().getId() : null,
                 newFilm.getId()
         );
+
+        jdbcTemplate.update("DELETE FROM films_directors WHERE film_id = ?", newFilm.getId());
+
+        if (newFilm.getDirectors() != null) {
+            for (Director director : newFilm.getDirectors()) {
+                jdbcTemplate.update("INSERT INTO films_directors (film_id, director_id) VALUES (?, ?)",
+                        newFilm.getId(), director.getId());
+            }
+        }
         return newFilm;
     }
 
