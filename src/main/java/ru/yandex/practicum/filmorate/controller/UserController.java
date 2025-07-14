@@ -80,7 +80,9 @@ public class UserController {
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+		log.info("Получен HTTP запрос на удаление пользователя по id: {}", id);
 		userService.deleteUser(id);
+		log.info("Пользователь успешно удален, id: {}", id);
 		return ResponseEntity.ok().build();
 	}
 }
