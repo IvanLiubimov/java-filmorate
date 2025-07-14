@@ -1,15 +1,14 @@
 package ru.yandex.practicum.filmorate.service;
 
-import java.util.Collection;
-
-import org.springframework.stereotype.Service;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
+
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -60,10 +59,6 @@ public class FilmService {
         filmValidator.validate(newFilm);
         return filmRepository.updateFilm(newFilm);
     }
-
-	public void deleteFilm(Long filmId) {
-		filmRepository.deleteFilm(filmId);
-	}
 
 
 }

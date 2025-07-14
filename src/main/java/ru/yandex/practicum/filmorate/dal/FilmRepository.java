@@ -1,17 +1,16 @@
 package ru.yandex.practicum.filmorate.dal;
 
-import java.util.Collection;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-
 import ru.yandex.practicum.filmorate.dal.mapper.FilmResultSetExtractor;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+
+import java.util.Collection;
+import java.util.Optional;
 
 @Repository
 public class FilmRepository extends BaseRepository<Film> {
@@ -45,10 +44,6 @@ public class FilmRepository extends BaseRepository<Film> {
             "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
             "WHERE f.id = ?";
 
-    private static final String DELETE_FILM = ""
-    		+ "DELETE "
-    		+ "FROM films "
-    		+ "WHERE id = ?";
 
     public FilmRepository(JdbcTemplate jdbcTemplate, @Qualifier("filmMapper") RowMapper<Film> mapper) {
         super(jdbcTemplate, mapper);
@@ -152,7 +147,6 @@ public class FilmRepository extends BaseRepository<Film> {
         return count != null && count == 1;
     }
 
-	public void deleteFilm(Long filmId) {
-		delete(DELETE_FILM, filmId);
-	}
+
+
 }
