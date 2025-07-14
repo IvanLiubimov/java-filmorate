@@ -14,13 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-<<<<<<< HEAD
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.Film;
-=======
->>>>>>> 912a6aa (#4 добавлена функция удаления пользователя)
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FeedService;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -87,7 +82,6 @@ public class UserController {
         return userService.showMutualFriends(id, otherId);
     }
 
-<<<<<<< HEAD
     @GetMapping("/{id}/feed")
     public Collection<FeedEvent> getUserFeed(@PathVariable("id") Long userId) {
         log.info("Получение ленты событий пользователя ID: {}", userId);
@@ -100,12 +94,12 @@ public class UserController {
         return userService.getRecommendedFilms(userId);
     }
 
-=======
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+		log.info("Получен HTTP запрос на удаление пользователя по id: {}", id);
 		userService.deleteUser(id);
+		log.info("Пользователь успешно удален, id: {}", id);
 		return ResponseEntity.ok().build();
 	}
->>>>>>> 912a6aa (#4 добавлена функция удаления пользователя)
 }
 

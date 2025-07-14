@@ -1,17 +1,5 @@
 package ru.yandex.practicum.filmorate.dal;
 
-<<<<<<< HEAD
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dal.mapper.FilmResultSetExtractor;
-import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
-
-=======
->>>>>>> 912a6aa (#4 добавлена функция удаления пользователя)
 import java.sql.Date;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,37 +11,38 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import ru.yandex.practicum.filmorate.dal.mapper.FilmResultSetExtractor;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 
 @Repository
 public class UserRepository extends BaseRepository<User> {
-   
 	private static final String FIND_ALL_USERS = ""
     		+ "SELECT * "
     		+ "FROM users";
-    
-    private static final String CREATE_USER = ""
+
+	private static final String CREATE_USER = ""
     		+ "INSERT INTO users(name, login, email, birthday) "
     		+ "VALUES (?, ?, ?, ?)";
-    
-    private static final String FIND_USER_BY_ID = ""
+
+	private static final String FIND_USER_BY_ID = ""
     		+ "SELECT * "
     		+ "FROM users "
     		+ "WHERE id = ?";
 
-    private static final String UPDATE_USER = ""
+	private static final String UPDATE_USER = ""
     		+ "UPDATE users "
 			+ "SET email = ?, login = ?, name = ?, birthday = ? "
     		+ "WHERE id = ?";
-    
-    private static final String DELETE_USER = ""
+
+	private static final String DELETE_USER = ""
     		+ "DELETE "
     		+ "FROM users "
     		+ "WHERE id = ?";
 
-    public UserRepository(JdbcTemplate jdbc, @Qualifier("userMapper") RowMapper<User> mapper) {
+	public UserRepository(JdbcTemplate jdbc, @Qualifier("userMapper") RowMapper<User> mapper) {
         super(jdbc, mapper);
     }
 
@@ -100,8 +89,8 @@ public class UserRepository extends BaseRepository<User> {
         		+ "FROM friendship "
         		+ "WHERE user_id = ? AND friend_id = ?";
         Integer count = jdbcTemplate.queryForObject(queryCheck, Integer.class, id, friendId);
-       
-        if (count != null && count > 0) {
+
+		if (count != null && count > 0) {
             throw new ConditionsNotMetException("Такие друзья уже существуют");
         }
 
@@ -112,8 +101,8 @@ public class UserRepository extends BaseRepository<User> {
     }
 
     public void deleteFriend(Long id, long friendId) {
-        
-    	String query = ""
+
+		String query = ""
     			+ "DELETE "
     			+ "FROM friendship "
     			+ "WHERE user_id = ? AND friend_id = ?";
@@ -131,7 +120,6 @@ public class UserRepository extends BaseRepository<User> {
         return jdbcTemplate.query(query, mapper, id, friendId);
     }
 
-<<<<<<< HEAD
     public Collection<Film> getRecommendedFilms(long userId) {
         // 1. Находим пользователей с максимальным пересечением по лайкам
         String similarUsersQuery = "SELECT fl2.user_id AS similar_user_id, " +
@@ -180,19 +168,17 @@ public class UserRepository extends BaseRepository<User> {
 
         return jdbcTemplate.query(recommendedFilmsQuery, new FilmResultSetExtractor(), similarUserId, userId);
     }
-=======
+
 	public void deleteUser(Long userId) {
 		delete(DELETE_USER, userId);
 	}
-	
-	public boolean isUserExists (Long userId) {
+
+	public boolean isUserExists(Long userId) {
 		String isUserExistsSql = ""
 				+ "SELECT EXISTS (SELECT 1 "
 								+ "FROM users "
 								+ "WHERE id = ?";
 		return jdbcTemplate.queryForObject(isUserExistsSql, Boolean.class);
 	}
->>>>>>> 912a6aa (#4 добавлена функция удаления пользователя)
-
 }
 
