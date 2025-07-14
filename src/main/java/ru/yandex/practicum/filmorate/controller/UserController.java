@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FeedService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import java.util.Collection;
 
@@ -14,6 +16,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final FeedService feedService;
 
     @GetMapping
     public Collection<User> getListOfUsers() {
@@ -67,6 +70,12 @@ public class UserController {
     public Collection<User> showMutualFriends(@PathVariable Long id, @PathVariable Long otherId) {
         log.info("Получен HTTP запрос на показ общих из друзей пользователем " + id + "  и пользователя " + otherId);
         return userService.showMutualFriends(id, otherId);
+    }
+
+    @GetMapping("/{id}/feed")
+    public Collection<FeedEvent> getUserFeed(@PathVariable("id") Long userId) {
+        log.info("Получение ленты событий пользователя ID: {}", userId);
+        return feedService.getUserFeed(userId);
     }
 
 }
