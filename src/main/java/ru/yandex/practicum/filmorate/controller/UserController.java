@@ -89,15 +89,7 @@ public class UserController {
         return feedService.getUserFeed(userid);
     }
 
-    /*@GetMapping("/{id}/feed")
-    public Collection<FeedEvent> getUserFeedById(
-            @PathVariable(required = false) Long id) {
 
-        if (id == null) {
-            return Collections.emptyList();
-        }
-        return feedService.getUserFeed(id);
-    }*/
 
 
 
