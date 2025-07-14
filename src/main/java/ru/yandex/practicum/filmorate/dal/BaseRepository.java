@@ -1,18 +1,19 @@
 package ru.yandex.practicum.filmorate.dal;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import ru.yandex.practicum.filmorate.dal.mapper.FilmResultSetExtractor;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
-
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+
+import lombok.RequiredArgsConstructor;
+import ru.yandex.practicum.filmorate.dal.mapper.FilmResultSetExtractor;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 
 @RequiredArgsConstructor
 public class BaseRepository<T> {
@@ -67,4 +68,11 @@ public class BaseRepository<T> {
             throw new NotFoundException("Не удалось обновить данные");
         }
     }
+
+	protected void delete(String query, Object... params) {
+		int rowsUpdated = jdbcTemplate.update(query, params);
+		if (rowsUpdated == 0) {
+			throw new NotFoundException("Не удалось удалить данные");
+		}
+	}
 }

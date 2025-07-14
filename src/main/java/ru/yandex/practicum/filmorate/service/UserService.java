@@ -1,15 +1,16 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.Collection;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
-
-import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
@@ -100,6 +101,10 @@ public class UserService {
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
         return count != null && count > 0;
     }
+
+	public void deleteUser(Long userId) {
+		userRepository.deleteUser(userId);
+	}
 
 
 
