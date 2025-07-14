@@ -24,5 +24,5 @@ public class FeedEvent {
     private FeedEventOperation operation; // Тип операции
     private Long entityId;
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)// ID связанной сущности
-    private Instant timestamp; // Время события
+    private long timestamp; // Время события
 }

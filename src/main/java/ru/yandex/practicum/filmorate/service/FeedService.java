@@ -30,7 +30,8 @@ public class FeedService {
                 .eventType(FeedEventType.LIKE)
                 .operation(operation)
                 .entityId(filmId)
-                .timestamp(Instant.now())
+                //.timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
         feedRepository.save(event);
     }
@@ -41,7 +42,8 @@ public class FeedService {
                 .eventType(FeedEventType.FRIEND)
                 .operation(operation)
                 .entityId(friendId)
-                .timestamp(Instant.now())
+                //.timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
         feedRepository.save(event);
     }
@@ -52,7 +54,8 @@ public class FeedService {
                 .eventType(FeedEventType.REVIEW)
                 .operation(operation)
                 .entityId(reviewId)
-                .timestamp(Instant.now())
+                //.timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
         feedRepository.save(event);
     }
@@ -63,7 +66,8 @@ public class FeedService {
                 .eventType(FeedEventType.LIKE)
                 .operation(operation)
                 .entityId(reviewId)  // Явно указываем, что это ID отзыва
-                .timestamp(Instant.now())
+                //.timestamp(Instant.now())
+                .timestamp(System.currentTimeMillis())
                 .build();
         feedRepository.save(event);
     }

@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS user_feeds (
   event_type VARCHAR(20) NOT NULL,
   operation VARCHAR(20) NOT NULL,
   entity_id INTEGER NOT NULL,
-  timestamp BIGINT,
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT valid_event_type CHECK (event_type IN ('LIKE', 'REVIEW', 'FRIEND')),
   CONSTRAINT valid_operation CHECK (operation IN ('ADD', 'REMOVE', 'UPDATE'))
 );

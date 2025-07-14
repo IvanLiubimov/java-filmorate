@@ -45,7 +45,8 @@ public class FeedRepository {
                 event.getEventType().name(),
                 event.getOperation().name(),
                 event.getEntityId(),
-                Timestamp.from(event.getTimestamp())  // Конвертация Instant → SQL Timestamp
+                //Timestamp.from(event.getTimestamp())  // Конвертация Instant → SQL Timestamp
+                new Timestamp(event.getTimestamp())
         );
     }
 
@@ -67,7 +68,8 @@ public class FeedRepository {
                 .eventType(FeedEventType.valueOf(rs.getString("event_type")))
                 .operation(FeedEventOperation.valueOf(rs.getString("operation")))
                 .entityId(rs.getLong("entity_id"))
-                .timestamp(rs.getTimestamp("timestamp").toInstant())  // Конвертация SQL Timestamp → Instant
+                //.timestamp(rs.getTimestamp("timestamp").toInstant())  // Конвертация SQL Timestamp → Instant
+                .timestamp(rs.getTimestamp("timestamp").getTime())
                 .build();
     }
 }
