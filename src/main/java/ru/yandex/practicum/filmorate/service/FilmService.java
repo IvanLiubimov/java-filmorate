@@ -65,5 +65,8 @@ public class FilmService {
 		filmRepository.deleteFilm(filmId);
 	}
 
+	public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+		return filmRepository.getCommonFilms(userId, friendId);
+	}
 
 }
