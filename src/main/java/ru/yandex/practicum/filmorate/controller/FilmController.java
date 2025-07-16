@@ -1,4 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -54,9 +55,12 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> getMostPopular(@RequestParam(defaultValue = "10") Integer count) {
-        log.info("Получен HTTP запрос на вывод списка популярных фильмов");
-        return filmService.mostPopular(count);
+    public Collection<Film> getMostPopularFilms(
+            @RequestParam(defaultValue = "10") @Positive final Integer count,
+            @RequestParam(required = false) @Positive final Integer genreId,
+            @RequestParam(required = false) @Positive final Integer year) {
+        log.info("Получен запрос на получение {} популярных фильмов по жанру {} и году {}", count, genreId, year);
+        return filmService.mostPopular(count, genreId, year);
     }
 }
 

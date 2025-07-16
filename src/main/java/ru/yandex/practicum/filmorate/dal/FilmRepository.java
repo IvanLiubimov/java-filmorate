@@ -8,10 +8,18 @@ import ru.yandex.practicum.filmorate.dal.mapper.FilmResultSetExtractor;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Rating;
+import lombok.extern.slf4j.Slf4j;
 
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Repository
 public class FilmRepository extends BaseRepository<Film> {
     FilmResultSetExtractor filmResultSetExtractor = new FilmResultSetExtractor();
@@ -145,6 +153,47 @@ public class FilmRepository extends BaseRepository<Film> {
                 ratingId);
 
         return count != null && count == 1;
+    }
+
+    public Collection<Film> mostPopular(Integer count, Integer genreId, Integer year) {
+        log.info("Запрос в БД: получение {} популярных фильмов по жанру {} и году {}", count, genreId, year);
+        String sql = "SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id, r.name AS rating_name " +
+                "FROM films f " +
+                "LEFT JOIN film_likes l ON f.id = l.film_id " +
+                "LEFT JOIN rating r ON f.rating_id = r.id " +
+                "LEFT JOIN films_genres fg ON f.id = fg.film_id " +
+                "WHERE (fg.genre_id = ? OR ? IS NULL) " +
+                "  AND (EXTRACT(YEAR FROM f.releaseDate) = ? OR ? IS NULL) " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(l.user_id) DESC " +
+                "LIMIT ?";
+        log.debug("SQL Query: {}", sql);
+        Collection<Film> films = jdbcTemplate.query(sql, this::mapRowToFilm, genreId, genreId, year, year, count);
+        log.debug("Получено из БД {} фильмов", films.size());
+        return films;
+    }
+
+    private Film mapRowToFilm(ResultSet rs, int rowNum) throws SQLException {
+        Film film = Film.builder()
+                .id(rs.getLong("id"))
+                .name(rs.getString("name"))
+                .description(rs.getString("description"))
+                .releaseDate(rs.getDate("releaseDate").toLocalDate())
+                .duration(java.time.Duration.ofMinutes(rs.getInt("duration")))
+                .rating(Rating.builder().id(rs.getInt("rating_id")).name(rs.getString("rating_name")).build())
+                .build();
+
+        String sqlGenres = "SELECT g.genre_id, g.name FROM genres g " +
+                "JOIN films_genres fg ON g.genre_id = fg.genre_id " +
+                "WHERE fg.film_id = ?";
+
+        List<Genre> genres = jdbcTemplate.query(sqlGenres, (rs1, rowNum1) -> Genre.builder()
+                .id(rs1.getInt("genre_id"))
+                .name(rs1.getString("name"))
+                .build(), film.getId());
+
+        film.setGenres(new ArrayList<>(genres));
+        return film;
     }
 
 

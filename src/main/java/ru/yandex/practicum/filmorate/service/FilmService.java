@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
@@ -8,8 +10,9 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
-import java.util.*;
+import java.util.Collection;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FilmService {
@@ -58,6 +61,16 @@ public class FilmService {
 
         filmValidator.validate(newFilm);
         return filmRepository.updateFilm(newFilm);
+    }
+
+    public Collection<Film> mostPopular(Integer count, Integer genreId, Integer year) {
+        log.info("Получение {} популярных фильмов по жанру {} и году {}", count, genreId, year);
+        try {
+            return filmRepository.mostPopular(count, genreId, year);
+        } catch (DataAccessException e) {
+            log.error("Ошибка при получении популярных фильмов по жанру {} и году {}", genreId, year, e);
+            throw new RuntimeException("Ошибка при получении популярных фильмов", e);
+        }
     }
 
 
