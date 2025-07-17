@@ -42,7 +42,6 @@ public class BaseRepository<T> {
         }
     }
 
-
     public long create(String query, Object... params) {
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {

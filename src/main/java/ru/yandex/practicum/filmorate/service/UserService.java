@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
@@ -105,7 +106,14 @@ public class UserService {
         return count != null && count > 0;
     }
 
+    public Collection<Film> getRecommendedFilms(long userId) {
+        userValidator.userExists(userId);
 
+        Collection<Film> recommendedFilms = userRepository.getRecommendedFilms(userId);
+
+
+        return recommendedFilms;
+    }
 
 }
 

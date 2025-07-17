@@ -32,8 +32,20 @@ public class FilmController {
         return ResponseEntity.ok(film);
     }
 
+    @GetMapping("/director/{directorId}")
+    public Collection<Film> getFilmsByDirector(
+            @PathVariable long directorId,
+            @RequestParam(defaultValue = "year") String sortBy) {
+        if (sortBy.equals("year")) {
+            return filmService.getFilmsByDirectorSortedByYears(directorId);
+        }
+        return filmService.getFilmsByDirectorSortedByLikes(directorId);
+    }
+
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
+        log.info("Тело запроса: {}", film);
+        log.info("Режиссёры из тела: {}", film.getDirectors());
         log.info("Получен HTTP запрос на создание фильма: {}", film);
         return filmService.createFilm(film);
     }

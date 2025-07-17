@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.FeedEvent;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FeedService;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -76,6 +77,12 @@ public class UserController {
     public Collection<FeedEvent> getUserFeed(@PathVariable("id") Long userId) {
         log.info("Получение ленты событий пользователя ID: {}", userId);
         return feedService.getUserFeed(userId);
+    }
+
+    @GetMapping("/{userId}/recommendations")
+    public Collection<Film> getRecommendedFilms(@PathVariable Long userId) {
+        log.info("Получен HTTP запрос на получение рекомендаций для пользователя с id: {}", userId);
+        return userService.getRecommendedFilms(userId);
     }
 
 }
