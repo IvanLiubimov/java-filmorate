@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -62,7 +63,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film update(@RequestBody Film newFilm) { 
+    public Film update(@RequestBody Film newFilm) {
         log.info("Получен HTTP запрос на обновление фильма: {}", newFilm);
         return filmService.update(newFilm);
     }
