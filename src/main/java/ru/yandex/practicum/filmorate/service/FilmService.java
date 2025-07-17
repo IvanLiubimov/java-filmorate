@@ -82,4 +82,16 @@ public class FilmService {
         return filmRepository.getFilmsByDirectorSortedByYears(directorId);
     }
 
+    public List<Film> getFilmByDirector(String query) {
+        return filmRepository.getFilmByDirector(query);
+    }
+
+    public List<Film> getFilmByTitle(String query) {
+        return filmRepository.getFilmByTitle(query);
+    }
+
+    public List<Film> searchAll(String query) {
+        return filmRepository.searchAll(query);
+    }
+
 }

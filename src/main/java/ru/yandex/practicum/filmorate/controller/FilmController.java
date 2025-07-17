@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -31,6 +32,21 @@ public class FilmController {
         log.info("Получен HTTP запрос на получение фильма по id: {}", id);
         Film film = filmService.getFilmById(id);
         return ResponseEntity.ok(film);
+    }
+
+    @GetMapping("/search")
+    public List<Film> searchFilms(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "title") String by) {
+        if (by.equals("director")) {
+            return filmService.getFilmByDirector(query);
+        } else if (by.equals("title")) {
+            return filmService.getFilmByTitle(query);
+        } else if (by.equals("title,director") || by.equals("director,title")) {
+            return filmService.searchAll(query);
+        } else {
+            throw new ConditionsNotMetException("Неверные параметры поиска");
+        }
     }
 
     @GetMapping("/director/{directorId}")
