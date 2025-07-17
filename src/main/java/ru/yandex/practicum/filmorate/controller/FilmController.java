@@ -37,7 +37,7 @@ public class FilmController {
             return filmService.getFilmByDirector(query);
         } else if (by.equals("title")) {
             return filmService.getFilmByTitle(query);
-        } else if (by.equals("director,title")) {
+        } else if (by.equals("title,director") || by.equals("director,title")) {
             return filmService.searchAll(query);
         } else {
             throw new ConditionsNotMetException("Неверные параметры поиска");
