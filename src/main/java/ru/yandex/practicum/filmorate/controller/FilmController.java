@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import java.util.Collection;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -45,7 +44,7 @@ public class FilmController {
     }
 
     @GetMapping("/director/{directorId}")
-    public List<Film> getFilmsByDirector(
+    public Collection<Film> getFilmsByDirector(
             @PathVariable long directorId,
             @RequestParam(defaultValue = "year") String sortBy) {
         if (sortBy.equals("year")) {

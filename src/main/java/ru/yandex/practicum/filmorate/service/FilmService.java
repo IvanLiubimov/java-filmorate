@@ -62,7 +62,6 @@ public class FilmService {
     }
 
     public Film update(Film newFilm) {
-
         filmValidator.validate(newFilm);
         return filmRepository.updateFilm(newFilm);
     }
