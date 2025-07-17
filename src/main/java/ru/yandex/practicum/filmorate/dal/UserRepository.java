@@ -4,11 +4,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.dal.mapper.FilmResultSetExtractor;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -83,6 +87,56 @@ public class UserRepository extends BaseRepository<User> {
                 "JOIN friendship f2 ON u.id = f2.friend_id " +
                 "WHERE f1.user_id = ? AND f2.user_id = ?";
         return jdbcTemplate.query(query, mapper, id, friendId);
+    }
+
+    public Collection<Film> getRecommendedFilms(long userId) {
+        // 1. Находим пользователей с максимальным пересечением по лайкам
+        String similarUsersQuery = "SELECT fl2.user_id AS similar_user_id, " +
+                "COUNT(*) AS common_likes_count " +
+                "FROM film_likes fl1 " +
+                "JOIN film_likes fl2 ON fl1.film_id = fl2.film_id AND fl1.user_id != fl2.user_id " +
+                "WHERE fl1.user_id = ? " +
+                "GROUP BY fl2.user_id " +
+                "ORDER BY common_likes_count DESC " +
+                "LIMIT 1";
+
+
+        // 2. Если нет пользователей с общими лайками, возвращаем null (обработаем в сервисе)
+        List<Long> similarUserIds = jdbcTemplate.query(
+                similarUsersQuery,
+                (rs, rowNum) -> rs.getLong("similar_user_id"),
+                userId
+        );
+
+        if (similarUserIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        long similarUserId = similarUserIds.get(0);
+
+        // 3. Находим фильмы, которые понравились похожему пользователю, но не текущему
+        String recommendedFilmsQuery = "SELECT f.*, " +
+                "f.rating_id, " +
+                "fg.genre_id, " +
+                "g.name AS genre_name, " +
+                "fl.user_id AS like_user_id, " +
+                "r.name AS rating_name " +
+                "FROM films f " +
+                "LEFT JOIN films_genres fg ON f.id = fg.film_id " +
+                "LEFT JOIN genres g ON fg.genre_id = g.genre_id " +
+                "LEFT JOIN rating r ON f.rating_id = r.id " +
+                "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
+                "WHERE f.id IN (" +
+                "SELECT film_id " +
+                "FROM film_likes " +
+                "WHERE user_id = ? AND film_id NOT IN (" +
+                "SELECT film_id " +
+                "FROM film_likes " +
+                "WHERE user_id = ?" +
+                ")" +
+                ")";
+
+        return jdbcTemplate.query(recommendedFilmsQuery, new FilmResultSetExtractor(), similarUserId, userId);
     }
 
 

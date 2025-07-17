@@ -1,16 +1,23 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+
 import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
+
+import ru.yandex.practicum.filmorate.validator.DirectorValidator;
+
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FilmService {
@@ -18,6 +25,8 @@ public class FilmService {
     private final FilmValidator filmValidator;
     private final FeedService feedService;
     private final UserValidator userValidator;
+    private final DirectorValidator directorValidator;
+    private final DirectorService directorService;
 
 
     public Film getFilmById(long filmId) {
@@ -54,15 +63,26 @@ public class FilmService {
     }
 
     public Film createFilm(Film film) {
+        log.info("Вызван метод createFilm с фильмом: {}", film);
         filmValidator.validate(film);
         return filmRepository.createFilm(film);
     }
 
     public Film update(Film newFilm) {
-
         filmValidator.validate(newFilm);
         return filmRepository.updateFilm(newFilm);
     }
 
+    public List<Film> getFilmsByDirectorSortedByLikes(long directorId) {
+        Director director = directorService.getDirectorById(directorId);
+        directorValidator.validate(director);
+        return filmRepository.getFilmsByDirectorSortedByLikes(directorId);
+    }
+
+    public List<Film> getFilmsByDirectorSortedByYears(long directorId) {
+        Director director = directorService.getDirectorById(directorId);
+        directorValidator.validate(director);
+        return filmRepository.getFilmsByDirectorSortedByYears(directorId);
+    }
 
 }
