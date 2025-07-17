@@ -1,17 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.filmorate.model.enums.FeedEventType;
 import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
+import ru.yandex.practicum.filmorate.model.enums.FeedEventType;
 
 @Data
 @Builder
