@@ -143,4 +143,14 @@ public class ReviewRepository implements ReviewStorage {
                 ") WHERE review_id = ?";
         jdbcTemplate.update(sql, reviewId, reviewId);
     }
+
+    @Override
+    public boolean wasLike(Long userId, Long reviewId) {
+        String sql = "SELECT is_positive FROM review_ratings WHERE review_id = ? AND user_id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, Boolean.class, reviewId, userId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

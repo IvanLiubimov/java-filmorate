@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
  public ErrorResponse handleValidationException(ConditionsNotMetException ex) {
      return ErrorResponse.builder()
              .errorCode(HttpStatus.BAD_REQUEST.value())
-             .description(ex.getMessage())
+             .error(ex.getMessage())
              .build();
  }
 
@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
  public ErrorResponse handleNotFoundException(NotFoundException ex) {
      return ErrorResponse.builder()
              .errorCode(HttpStatus.NOT_FOUND.value())
-             .description(ex.getMessage())
+             .error(ex.getMessage())
              .build();
  }
 
@@ -35,15 +35,14 @@ public class GlobalExceptionHandler {
  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
  public ErrorResponse handleUncaught(Exception exception) {
      return ErrorResponse.builder().errorCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-             .description(exception.getMessage()).build();
+             .error(exception.getMessage()).build();
  }
 
     @ExceptionHandler(ValidationException.class)
     public ErrorResponse handleValidation(ValidationException ex) {
      return ErrorResponse.builder()
                 .errorCode(HttpStatus.NOT_FOUND.value())
-                .description(ex.getMessage())
+                .error(ex.getMessage())
                 .build();
     }
-
 }

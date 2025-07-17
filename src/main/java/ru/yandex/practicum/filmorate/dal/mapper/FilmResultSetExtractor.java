@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.dal.mapper;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
@@ -37,7 +38,6 @@ public class FilmResultSetExtractor implements ResultSetExtractor<List<Film>> {
                         rating = new Rating(ratingId, ratingName);
                     }
 
-
                     return Film.builder()
                             .id(id)
                             .name(name)
@@ -46,6 +46,7 @@ public class FilmResultSetExtractor implements ResultSetExtractor<List<Film>> {
                             .duration(duration)
                             .rating(rating)
                             .genres(new ArrayList<>())
+                            .directors(new ArrayList<>())
                             .build();
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
@@ -60,6 +61,18 @@ public class FilmResultSetExtractor implements ResultSetExtractor<List<Film>> {
                         .anyMatch(g -> g.getId() == genreId);
                 if (!genreExists) {
                     film.getGenres().add(new Genre(genreId, genreName));
+                }
+            }
+
+            Long directorId = rs.getObject("director_id", Long.class);
+            String directorName = rs.getString("director_name");
+
+            if (directorId != null && directorName != null) {
+                boolean directorExists = film.getDirectors().stream()
+                        .anyMatch(d -> d.getId().equals(directorId));
+
+                if (!directorExists) {
+                    film.getDirectors().add(new Director(directorId, directorName));
                 }
             }
         }

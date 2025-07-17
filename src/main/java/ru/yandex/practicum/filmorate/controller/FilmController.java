@@ -1,4 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,8 @@ import java.util.List;
 @RequestMapping("/films")
 @RequiredArgsConstructor
 public class FilmController {
-   private final FilmService filmService;
-   private final ReviewService reviewService;
+    private final FilmService filmService;
+    private final ReviewService reviewService;
 
     @GetMapping
     public Collection<Film> getAllFilms() {
@@ -25,15 +26,27 @@ public class FilmController {
         return filmService.getAllFilms();
     }
 
-    @GetMapping ("{id}")
+    @GetMapping("{id}")
     public ResponseEntity<Film> getFilmById(@PathVariable Long id) {
         log.info("Получен HTTP запрос на получение фильма по id: {}", id);
         Film film = filmService.getFilmById(id);
         return ResponseEntity.ok(film);
     }
 
+    @GetMapping("/director/{directorId}")
+    public Collection<Film> getFilmsByDirector(
+            @PathVariable long directorId,
+            @RequestParam(defaultValue = "year") String sortBy) {
+        if (sortBy.equals("year")) {
+            return filmService.getFilmsByDirectorSortedByYears(directorId);
+        }
+        return filmService.getFilmsByDirectorSortedByLikes(directorId);
+    }
+
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
+        log.info("Тело запроса: {}", film);
+        log.info("Режиссёры из тела: {}", film.getDirectors());
         log.info("Получен HTTP запрос на создание фильма: {}", film);
         return filmService.createFilm(film);
     }
@@ -46,14 +59,14 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Long id,
-                                      @PathVariable Long userId) {
+                        @PathVariable Long userId) {
         log.info("Получен HTTP запрос на добавление лайка фильму пользователем: {} {}", id, userId);
         filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable Long id,
-                                      @PathVariable Long userId) {
+                           @PathVariable Long userId) {
         log.info("Получен HTTP запрос на удаление лайка фильма пользователем: {} {}", id, userId);
         filmService.deleteLike(id, userId);
     }
