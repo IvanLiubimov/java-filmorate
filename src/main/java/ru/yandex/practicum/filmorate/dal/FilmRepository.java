@@ -304,5 +304,4 @@ public class FilmRepository extends BaseRepository<Film> {
 
         return jdbcTemplate.query(sql, new FilmResultSetExtractor(), "%" + query + "%", "%" + query + "%");
     }
-
 }
