@@ -3,14 +3,12 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.FeedEvent;
-import ru.yandex.practicum.filmorate.model.enums.FeedEventType;
-import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
 import ru.yandex.practicum.filmorate.dal.FeedRepository;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
+import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
+import ru.yandex.practicum.filmorate.model.enums.FeedEventType;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Service
@@ -42,7 +40,6 @@ public class FeedService {
                 .eventType(FeedEventType.FRIEND)
                 .operation(operation)
                 .entityId(friendId)
-                //.timestamp(Instant.now())
                 .timestamp(System.currentTimeMillis())
                 .build();
         feedRepository.save(event);
@@ -54,7 +51,6 @@ public class FeedService {
                 .eventType(FeedEventType.REVIEW)
                 .operation(operation)
                 .entityId(reviewId)
-                //.timestamp(Instant.now())
                 .timestamp(System.currentTimeMillis())
                 .build();
         feedRepository.save(event);
@@ -65,8 +61,7 @@ public class FeedService {
                 .userId(userId)
                 .eventType(FeedEventType.LIKE)
                 .operation(operation)
-                .entityId(reviewId)  // Явно указываем, что это ID отзыва
-                //.timestamp(Instant.now())
+                .entityId(reviewId)
                 .timestamp(System.currentTimeMillis())
                 .build();
         feedRepository.save(event);
