@@ -3,13 +3,12 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.FeedEvent;
-import ru.yandex.practicum.filmorate.model.enums.FeedEventType;
-import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
 import ru.yandex.practicum.filmorate.dal.FeedRepository;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
+import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
+import ru.yandex.practicum.filmorate.model.enums.FeedEventType;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Service

@@ -5,11 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.filmorate.model.enums.FeedEventType;
 import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
+import ru.yandex.practicum.filmorate.model.enums.FeedEventType;
 
 @Data
 @Builder
@@ -22,5 +19,5 @@ public class FeedEvent {
     private FeedEventType eventType;     // Тип события
     private FeedEventOperation operation; // Тип операции
     private Long entityId;        // ID связанной сущности
-    private long  timestamp; // Время события
+    private long timestamp; // Время события
 }

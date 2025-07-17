@@ -3,16 +3,14 @@ package ru.yandex.practicum.filmorate.dal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.FeedEvent;
-import ru.yandex.practicum.filmorate.model.enums.FeedEventType;
 import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
+import ru.yandex.practicum.filmorate.model.enums.FeedEventType;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Repository
@@ -33,7 +31,6 @@ public class FeedRepository {
                 event.getEventType().name(),
                 event.getOperation().name(),
                 event.getEntityId(),
-               // event.getTimestamp());
                 new Timestamp(event.getTimestamp()));
     }
 

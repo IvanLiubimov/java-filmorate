@@ -66,28 +66,28 @@ public class FilmRepository extends BaseRepository<Film> {
 
     public Collection<Film> mostPopular(Integer count) {
         String query = """
-                SELECT f.id,
-        f.name,
-        f.description,
-        f.releaseDate,
-        f.duration,
-        f.rating_id,
-        r.name AS rating_name,
-        g.genre_id AS genre_id,
-        g.name AS genre_name,
-        COALESCE(fl.like_count, 0) AS like_count
-        FROM films f
-        LEFT JOIN (
-            SELECT film_id, COUNT(*) AS like_count
-            FROM film_likes
-            GROUP BY film_id
-        ) AS fl ON f.id = fl.film_id
-        LEFT JOIN films_genres AS fg ON f.id = fg.film_id
-        LEFT JOIN genres AS g ON fg.genre_id = g.genre_id
-        LEFT JOIN rating r ON f.rating_id = r.id
-        ORDER BY like_count DESC, f.id ASC
-        LIMIT ?
-        """;
+                        SELECT f.id,
+                f.name,
+                f.description,
+                f.releaseDate,
+                f.duration,
+                f.rating_id,
+                r.name AS rating_name,
+                g.genre_id AS genre_id,
+                g.name AS genre_name,
+                COALESCE(fl.like_count, 0) AS like_count
+                FROM films f
+                LEFT JOIN (
+                    SELECT film_id, COUNT(*) AS like_count
+                    FROM film_likes
+                    GROUP BY film_id
+                ) AS fl ON f.id = fl.film_id
+                LEFT JOIN films_genres AS fg ON f.id = fg.film_id
+                LEFT JOIN genres AS g ON fg.genre_id = g.genre_id
+                LEFT JOIN rating r ON f.rating_id = r.id
+                ORDER BY like_count DESC, f.id ASC
+                LIMIT ?
+                """;
         return jdbcTemplate.query(query, filmResultSetExtractor, count);
     }
 
@@ -146,7 +146,6 @@ public class FilmRepository extends BaseRepository<Film> {
 
         return count != null && count == 1;
     }
-
 
 
 }

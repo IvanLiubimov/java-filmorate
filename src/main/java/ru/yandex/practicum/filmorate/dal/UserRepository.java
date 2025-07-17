@@ -19,7 +19,7 @@ public class UserRepository extends BaseRepository<User> {
     private static final String FIND_USER_BY_ID = "SELECT * FROM users WHERE id = ?";
     private static final String UPDATE_USER = "UPDATE users SET  email = ?, login = ?, name = ?, birthday = ?  WHERE id = ?";
 
-    public UserRepository(JdbcTemplate jdbc, @Qualifier ("userMapper") RowMapper<User> mapper) {
+    public UserRepository(JdbcTemplate jdbc, @Qualifier("userMapper") RowMapper<User> mapper) {
         super(jdbc, mapper);
     }
 
@@ -84,7 +84,6 @@ public class UserRepository extends BaseRepository<User> {
                 "WHERE f1.user_id = ? AND f2.user_id = ?";
         return jdbcTemplate.query(query, mapper, id, friendId);
     }
-
 
 
 }

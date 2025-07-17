@@ -2,18 +2,14 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ErrorResponse;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FeedService;
 import ru.yandex.practicum.filmorate.service.UserService;
+
 import java.util.Collection;
-import java.util.Collections;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -26,7 +22,7 @@ public class UserController {
     @GetMapping
     public Collection<User> getListOfUsers() {
         log.info("Получен HTTP запрос на получение всех пользователей");
-       return userService.getListOfUsers();
+        return userService.getListOfUsers();
 
     }
 
@@ -77,23 +73,11 @@ public class UserController {
         return userService.showMutualFriends(id, otherId);
     }
 
-    @GetMapping("/feed")
-    public Collection<FeedEvent> getAllFeed() {
-        log.info("Получен запрос на получение всей ленты событий");
-        return feedService.getAllFeed();
-    }
-
     @GetMapping("/{userid}/feed")
     public Collection<FeedEvent> getUserFeed(@PathVariable Long userid) {
         log.info("Получен запрос на ленту пользователя с ID: {}", userid);
         return feedService.getUserFeed(userid);
     }
-
-
-
-
-
-
 
 
 }
