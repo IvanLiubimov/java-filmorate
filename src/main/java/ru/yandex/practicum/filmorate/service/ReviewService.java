@@ -16,18 +16,26 @@ public class ReviewService {
 
     public Review create(Review review) {
         validateUserAndFilm(review.getUserId(), review.getFilmId());
-        return reviewStorage.create(review);
+        Review createdReview = reviewStorage.create(review);
+        // Добавляем событие создания отзыва в ленту
+        feedService.addReviewEvent(createdReview.getUserId(), createdReview.getReviewId(), FeedEventOperation.ADD);
+        return createdReview;
     }
 
     public Review update(Review review) {
         validateReviewExists(review.getReviewId());
         validateUserAndFilm(review.getUserId(), review.getFilmId());
-        return reviewStorage.update(review);
+        Review updatedReview = reviewStorage.update(review);
+        // Добавляем событие обновления отзыва в ленту
+        feedService.addReviewEvent(updatedReview.getUserId(), updatedReview.getReviewId(), FeedEventOperation.UPDATE);
+        return updatedReview;
     }
 
     public void delete(Long id) {
-        validateReviewExists(id);
+        Review review = getById(id); // Получаем отзыв перед удалением
         reviewStorage.delete(id);
+        // Добавляем событие удаления отзыва в ленту
+        feedService.addReviewEvent(review.getUserId(), review.getReviewId(), FeedEventOperation.REMOVE);
     }
 
     public Review getById(Long id) {
@@ -46,18 +54,30 @@ public class ReviewService {
         validateReviewExists(reviewId);
         userService.getUser(userId);
         reviewStorage.addLike(reviewId, userId);
+        // Добавляем событие лайка отзыва в ленту
+        feedService.addLikeToReviewEvent(userId, reviewId, FeedEventOperation.ADD);
     }
 
     public void addDislike(Long reviewId, Long userId) {
         validateReviewExists(reviewId);
         userService.getUser(userId);
         reviewStorage.addDislike(reviewId, userId);
+        // Добавляем событие дизлайка отзыва в ленту
+        feedService.addLikeToReviewEvent(userId, reviewId, FeedEventOperation.REMOVE);
     }
 
     public void removeLikeDislike(Long reviewId, Long userId) {
         validateReviewExists(reviewId);
         userService.getUser(userId);
+        // Перед удалением узнаем, был ли это лайк или дизлайк
+        boolean wasLike = reviewStorage.wasLike(userId, reviewId);
         reviewStorage.removeLikeDislike(reviewId, userId);
+        // Добавляем соответствующее событие в ленту
+        if (wasLike) {
+            feedService.addLikeEvent(userId, reviewId, FeedEventOperation.REMOVE);
+        } else {
+            feedService.addLikeEvent(userId, reviewId, FeedEventOperation.ADD);
+        }
     }
 
     private void validateReviewExists(Long reviewId) {
