@@ -100,6 +100,7 @@ public class UserRepository extends BaseRepository<User> {
                 "ORDER BY common_likes_count DESC " +
                 "LIMIT 1";
 
+
         // 2. Если нет пользователей с общими лайками, возвращаем null (обработаем в сервисе)
         List<Long> similarUserIds = jdbcTemplate.query(
                 similarUsersQuery,
@@ -137,6 +138,7 @@ public class UserRepository extends BaseRepository<User> {
 
         return jdbcTemplate.query(recommendedFilmsQuery, new FilmResultSetExtractor(), similarUserId, userId);
     }
+
 
 }
 

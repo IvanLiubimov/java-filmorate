@@ -7,7 +7,11 @@ import ru.yandex.practicum.filmorate.dal.FilmRepository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+
+import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
+
 import ru.yandex.practicum.filmorate.validator.DirectorValidator;
+
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
@@ -19,6 +23,7 @@ import java.util.*;
 public class FilmService {
     private final FilmRepository filmRepository;
     private final FilmValidator filmValidator;
+    private final FeedService feedService;
     private final UserValidator userValidator;
     private final DirectorValidator directorValidator;
     private final DirectorService directorService;
@@ -33,6 +38,7 @@ public class FilmService {
         getFilmById(filmId);
         userValidator.userExists(userId);
         filmRepository.addLike(userId, filmId);
+        feedService.addLikeEvent(userId, filmId, FeedEventOperation.ADD);
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -43,6 +49,7 @@ public class FilmService {
             throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }
         filmRepository.deleteLike(filmId, userId);
+        feedService.addLikeEvent(userId, filmId, FeedEventOperation.REMOVE);
     }
 
     public Collection<Film> mostPopular(Integer count) {

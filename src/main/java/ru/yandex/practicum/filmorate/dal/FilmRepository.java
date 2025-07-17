@@ -78,6 +78,7 @@ public class FilmRepository extends BaseRepository<Film> {
 
     public Collection<Film> mostPopular(Integer count) {
         String query = """
+
         SELECT f.id,
                f.name,
                f.description,
@@ -102,6 +103,7 @@ public class FilmRepository extends BaseRepository<Film> {
         ORDER BY like_count DESC, f.id ASC
         LIMIT ?
         """;
+
         return jdbcTemplate.query(query, filmResultSetExtractor, count);
     }
 
@@ -232,11 +234,14 @@ public class FilmRepository extends BaseRepository<Film> {
     }
 
 
+
+
     public boolean isDirectorExists(Long directorId) {
         String sql = "SELECT COUNT(*) FROM directors WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, directorId);
         return count != null && count > 0;
     }
+
 
 
 

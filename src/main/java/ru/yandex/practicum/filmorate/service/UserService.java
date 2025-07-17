@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.dal.UserRepository;
+import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.Collection;
@@ -17,6 +18,7 @@ import java.util.Collection;
 public class UserService {
     private final UserRepository userRepository;
     private final UserValidator userValidator;
+    private final FeedService feedService;
     protected final JdbcTemplate jdbcTemplate;
 
 
@@ -33,6 +35,7 @@ public class UserService {
             throw new NotFoundException("Пользователь с id " + friendId + " не найден.");
         }
         userRepository.addFriend(id, friendId);
+        feedService.addFriendEvent(id, friendId, FeedEventOperation.ADD);
     }
 
     public void deleteFriend(Long id, long friendId) {
@@ -46,6 +49,7 @@ public class UserService {
             throw new NotFoundException("Пользователь с id=" + friendId + " не найден");
         }
         userRepository.deleteFriend(id, friendId);
+        feedService.addFriendEvent(id, friendId, FeedEventOperation.REMOVE);
     }
 
     public Collection<User> showMutualFriends(Long id, long friendId) {
