@@ -15,10 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Repository
@@ -167,29 +164,6 @@ public class FilmRepository extends BaseRepository<Film> {
             LEFT JOIN film_likes l ON f.id = l.film_id
             LEFT JOIN films_genres fg ON f.id = fg.film_id
             LEFT JOIN genres g ON fg.genre_id = g.genre_id
-            WHERE (:genreId IS NULL OR fg.genre_id = :genreId)
-              AND (:year IS NULL OR EXTRACT(YEAR FROM f.releaseDate) = :year)
-            GROUP BY
-                f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id, r.name, g.genre_id, g.name
-            ORDER BY COUNT(l.user_id) DESC, f.id ASC
-            LIMIT :count
-            """;
-
-        log.debug("SQL Query: {}", sql);
-        MapSqlParameterSource parameters = new MapSqlParameterSource();
-        parameters.addValue("genreId", genreId);
-        parameters.addValue("year", year);
-        parameters.addValue("count", count);
-
-        sql = """
-            SELECT
-                f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id, r.name AS rating_name,
-                g.genre_id, g.name AS genre_name
-            FROM films f
-            LEFT JOIN rating r ON f.rating_id = r.id
-            LEFT JOIN film_likes l ON f.id = l.film_id
-            LEFT JOIN films_genres fg ON f.id = fg.film_id
-            LEFT JOIN genres g ON fg.genre_id = g.genre_id
             WHERE (fg.genre_id = ? OR ? IS NULL)
               AND (EXTRACT(YEAR FROM f.releaseDate) = ? OR ? IS NULL)
             GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id, r.name, g.genre_id, g.name
@@ -197,14 +171,11 @@ public class FilmRepository extends BaseRepository<Film> {
             LIMIT ?
             """;
 
-        // 1-й ? : fg.genre_id (genreId)
-        // 2-й ? : ? IS NULL (genreId)
-        // 3-й ? : EXTRACT(YEAR FROM f.releaseDate) (year)
-        // 4-й ? : ? IS NULL (year)
-        // 5-й ? : LIMIT (count)
+        log.debug("SQL Query: {}", sql);
+
         Collection<Film> films = jdbcTemplate.query(sql, new FilmResultSetExtractor(), genreId, genreId, year, year, count);
 
-        log.debug("Получено из БД {} фильмов", films.size());
+        log.debug("Получено из БД {} фильмов", Objects.requireNonNull(films).size());
         return films;
     }
 }
