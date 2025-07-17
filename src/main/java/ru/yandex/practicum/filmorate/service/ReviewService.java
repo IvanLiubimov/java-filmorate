@@ -78,7 +78,6 @@ public class ReviewService {
         if (wasLike) {
             feedService.addLikeEvent(userId, reviewId, FeedEventOperation.REMOVE);
         } else {
-            // Для дизлайков можно использовать другую операцию или ту же
             feedService.addLikeEvent(userId, reviewId, FeedEventOperation.ADD);
         }
     }
