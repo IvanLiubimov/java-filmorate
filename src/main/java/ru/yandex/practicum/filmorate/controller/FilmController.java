@@ -1,4 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class FilmController {
         return filmService.getAllFilms();
     }
 
-    @GetMapping ("{id}")
+    @GetMapping("{id}")
     public ResponseEntity<Film> getFilmById(@PathVariable Long id) {
         log.info("Получен HTTP запрос на получение фильма по id: {}", id);
         Film film = filmService.getFilmById(id);
