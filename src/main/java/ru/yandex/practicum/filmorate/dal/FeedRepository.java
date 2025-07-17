@@ -23,7 +23,6 @@ public class FeedRepository {
         return jdbcTemplate.query(sql, this::mapRowToFeedEvent, userId);
     }
 
-
     public void save(FeedEvent event) {
         jdbcTemplate.update(
                 "INSERT INTO user_feeds (user_id, event_type, operation, entity_id, timestamp) VALUES (?, ?, ?, ?, ?)",
@@ -36,7 +35,6 @@ public class FeedRepository {
         );
     }
 
-    
     private FeedEvent mapRowToFeedEvent(ResultSet rs, int rowNum) throws SQLException {
         return FeedEvent.builder()
                 .eventId(rs.getLong("event_id"))
@@ -44,7 +42,6 @@ public class FeedRepository {
                 .eventType(FeedEventType.valueOf(rs.getString("event_type")))
                 .operation(FeedEventOperation.valueOf(rs.getString("operation")))
                 .entityId(rs.getLong("entity_id"))
-                //.timestamp(rs.getTimestamp("timestamp").toInstant())  // Конвертация SQL Timestamp → Instant
                 .timestamp(rs.getTimestamp("timestamp").getTime())
                 .build();
     }
