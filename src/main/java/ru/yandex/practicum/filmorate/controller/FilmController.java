@@ -4,15 +4,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.ReviewService;
+
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/films")
 @RequiredArgsConstructor
 public class FilmController {
-   private final FilmService filmService;
+    private final FilmService filmService;
+    private final ReviewService reviewService;
 
     @GetMapping
     public Collection<Film> getAllFilms() {
@@ -53,14 +58,14 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Long id,
-                                      @PathVariable Long userId) {
+                        @PathVariable Long userId) {
         log.info("Получен HTTP запрос на добавление лайка фильму пользователем: {} {}", id, userId);
         filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable Long id,
-                                      @PathVariable Long userId) {
+                           @PathVariable Long userId) {
         log.info("Получен HTTP запрос на удаление лайка фильма пользователем: {} {}", id, userId);
         filmService.deleteLike(id, userId);
     }
@@ -69,6 +74,13 @@ public class FilmController {
     public Collection<Film> getMostPopular(@RequestParam(defaultValue = "10") Integer count) {
         log.info("Получен HTTP запрос на вывод списка популярных фильмов");
         return filmService.mostPopular(count);
+    }
+
+    @GetMapping("/{id}/reviews")
+    public List<Review> getFilmReviews(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "10") int count) {
+        return reviewService.getByFilmId(id, count);
     }
 }
 
