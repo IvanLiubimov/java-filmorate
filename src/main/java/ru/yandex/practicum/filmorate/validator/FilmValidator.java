@@ -31,8 +31,6 @@ import java.time.LocalDate;
             if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(EARLIEST_RELEASE_DATE)) {
                 throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1895 года");
             }
-
-
         }
 
     public boolean filmExists(Long filmId) {

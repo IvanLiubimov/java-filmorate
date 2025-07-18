@@ -1,19 +1,26 @@
 package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.constraints.Positive;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.ReviewService;
+
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/films")
 @RequiredArgsConstructor
 public class FilmController {
-   private final FilmService filmService;
+    private final FilmService filmService;
+    private final ReviewService reviewService;
 
     @GetMapping
     public Collection<Film> getAllFilms() {
@@ -21,15 +28,42 @@ public class FilmController {
         return filmService.getAllFilms();
     }
 
-    @GetMapping ("{id}")
+    @GetMapping("{id}")
     public ResponseEntity<Film> getFilmById(@PathVariable Long id) {
         log.info("Получен HTTP запрос на получение фильма по id: {}", id);
         Film film = filmService.getFilmById(id);
         return ResponseEntity.ok(film);
     }
 
+    @GetMapping("/search")
+    public List<Film> searchFilms(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "title") String by) {
+        if (by.equals("director")) {
+            return filmService.getFilmByDirector(query);
+        } else if (by.equals("title")) {
+            return filmService.getFilmByTitle(query);
+        } else if (by.equals("title,director") || by.equals("director,title")) {
+            return filmService.searchAll(query);
+        } else {
+            throw new ConditionsNotMetException("Неверные параметры поиска");
+        }
+    }
+
+    @GetMapping("/director/{directorId}")
+    public Collection<Film> getFilmsByDirector(
+            @PathVariable long directorId,
+            @RequestParam(defaultValue = "year") String sortBy) {
+        if (sortBy.equals("year")) {
+            return filmService.getFilmsByDirectorSortedByYears(directorId);
+        }
+        return filmService.getFilmsByDirectorSortedByLikes(directorId);
+    }
+
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
+        log.info("Тело запроса: {}", film);
+        log.info("Режиссёры из тела: {}", film.getDirectors());
         log.info("Получен HTTP запрос на создание фильма: {}", film);
         return filmService.createFilm(film);
     }
@@ -42,14 +76,14 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Long id,
-                                      @PathVariable Long userId) {
+                        @PathVariable Long userId) {
         log.info("Получен HTTP запрос на добавление лайка фильму пользователем: {} {}", id, userId);
         filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable Long id,
-                                      @PathVariable Long userId) {
+                           @PathVariable Long userId) {
         log.info("Получен HTTP запрос на удаление лайка фильма пользователем: {} {}", id, userId);
         filmService.deleteLike(id, userId);
     }
@@ -61,6 +95,13 @@ public class FilmController {
             @RequestParam(required = false) @Positive final Integer year) {
         log.info("Получен запрос на получение {} популярных фильмов по жанру {} и году {}", count, genreId, year);
         return filmService.mostPopular(count, genreId, year);
+    }
+
+    @GetMapping("/{id}/reviews")
+    public List<Review> getFilmReviews(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "10") int count) {
+        return reviewService.getByFilmId(id, count);
     }
 }
 

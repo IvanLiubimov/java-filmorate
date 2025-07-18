@@ -33,4 +33,5 @@ public class Film {
     @JsonProperty("mpa")
     private Rating rating;
     private List<Genre> genres = new ArrayList<>();
+    private List<Director> directors = new ArrayList<>();
 }
