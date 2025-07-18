@@ -4,21 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dal.mapper.FilmResultSetExtractor;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Rating;
-import lombok.extern.slf4j.Slf4j;
-
-
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -244,20 +235,20 @@ public class FilmRepository extends BaseRepository<Film> {
     public Collection<Film> mostPopular(Integer count, Integer genreId, Integer year) {
         log.info("Запрос в БД: получение {} популярных фильмов по жанру {} и году {}", count, genreId, year);
         String sql = """
-                SELECT
-                    f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id, r.name AS rating_name,
-                    g.genre_id, g.name AS genre_name
-                FROM films f
-                LEFT JOIN rating r ON f.rating_id = r.id
-                LEFT JOIN film_likes l ON f.id = l.film_id
-                LEFT JOIN films_genres fg ON f.id = fg.film_id
-                LEFT JOIN genres g ON fg.genre_id = g.genre_id
-                WHERE (fg.genre_id = ? OR ? IS NULL)
-                  AND (EXTRACT(YEAR FROM f.releaseDate) = ? OR ? IS NULL)
-                GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id, r.name, g.genre_id, g.name
-                ORDER BY COUNT(l.user_id) DESC, f.id ASC
-                LIMIT ?
-                """;
+            SELECT
+                f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id, r.name AS rating_name,
+                g.genre_id, g.name AS genre_name
+            FROM films f
+            LEFT JOIN rating r ON f.rating_id = r.id
+            LEFT JOIN film_likes l ON f.id = l.film_id
+            LEFT JOIN films_genres fg ON f.id = fg.film_id
+            LEFT JOIN genres g ON fg.genre_id = g.genre_id
+            WHERE (fg.genre_id = ? OR ? IS NULL)
+              AND (EXTRACT(YEAR FROM f.releaseDate) = ? OR ? IS NULL)
+            GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id, r.name, g.genre_id, g.name
+            ORDER BY COUNT(l.user_id) DESC, f.id ASC
+            LIMIT ?
+            """;
 
         log.debug("SQL Query: {}", sql);
 
@@ -265,7 +256,6 @@ public class FilmRepository extends BaseRepository<Film> {
 
         log.debug("Получено из БД {} фильмов", Objects.requireNonNull(films).size());
         return films;
-    }
 
     public boolean isDirectorExists(Long directorId) {
         String sql = "SELECT COUNT(*) FROM directors WHERE id = ?";
