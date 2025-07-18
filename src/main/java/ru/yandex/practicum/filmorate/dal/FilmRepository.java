@@ -258,6 +258,7 @@ public class FilmRepository extends BaseRepository<Film> {
         log.debug("Получено из БД {} фильмов", Objects.requireNonNull(films).size());
         return films;
     }
+
     public boolean isDirectorExists(Long directorId) {
         String sql = "SELECT COUNT(*) FROM directors WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, directorId);
