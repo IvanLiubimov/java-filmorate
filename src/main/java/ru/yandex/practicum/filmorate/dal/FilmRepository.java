@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -235,20 +236,20 @@ public class FilmRepository extends BaseRepository<Film> {
     public Collection<Film> mostPopular(Integer count, Integer genreId, Integer year) {
         log.info("Запрос в БД: получение {} популярных фильмов по жанру {} и году {}", count, genreId, year);
         String sql = """
-            SELECT
-                f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id, r.name AS rating_name,
-                g.genre_id, g.name AS genre_name
-            FROM films f
-            LEFT JOIN rating r ON f.rating_id = r.id
-            LEFT JOIN film_likes l ON f.id = l.film_id
-            LEFT JOIN films_genres fg ON f.id = fg.film_id
-            LEFT JOIN genres g ON fg.genre_id = g.genre_id
-            WHERE (fg.genre_id = ? OR ? IS NULL)
-              AND (EXTRACT(YEAR FROM f.releaseDate) = ? OR ? IS NULL)
-            GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id, r.name, g.genre_id, g.name
-            ORDER BY COUNT(l.user_id) DESC, f.id ASC
-            LIMIT ?
-            """;
+                SELECT
+                    f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id, r.name AS rating_name,
+                    g.genre_id, g.name AS genre_name
+                FROM films f
+                LEFT JOIN rating r ON f.rating_id = r.id
+                LEFT JOIN film_likes l ON f.id = l.film_id
+                LEFT JOIN films_genres fg ON f.id = fg.film_id
+                LEFT JOIN genres g ON fg.genre_id = g.genre_id
+                WHERE (fg.genre_id = ? OR ? IS NULL)
+                  AND (EXTRACT(YEAR FROM f.releaseDate) = ? OR ? IS NULL)
+                GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id, r.name, g.genre_id, g.name
+                ORDER BY COUNT(l.user_id) DESC, f.id ASC
+                LIMIT ?
+                """;
 
         log.debug("SQL Query: {}", sql);
 
@@ -256,7 +257,7 @@ public class FilmRepository extends BaseRepository<Film> {
 
         log.debug("Получено из БД {} фильмов", Objects.requireNonNull(films).size());
         return films;
-
+    }
     public boolean isDirectorExists(Long directorId) {
         String sql = "SELECT COUNT(*) FROM directors WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, directorId);
