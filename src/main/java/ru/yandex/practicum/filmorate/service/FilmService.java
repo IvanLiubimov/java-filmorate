@@ -16,6 +16,7 @@ import ru.yandex.practicum.filmorate.validator.FilmValidator;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @Service
