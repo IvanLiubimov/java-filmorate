@@ -187,8 +187,8 @@ public class FilmRepository extends BaseRepository<Film> {
 		if (newFilm.getGenres() != null && !newFilm.getGenres().isEmpty()) {
 			for (Genre genre : newFilm.getGenres()) {
 				if (genre != null && genre.getId() != null && isGenreExists(genre.getId())) {
-					jdbcTemplate.update("INSERT INTO films_genres (film_id, genre_id) VALUES (?, ?)", newFilm.getId(),
-							genre.getId());
+					String updateGenresSql = "INSERT INTO films_genres (film_id, genre_id) VALUES (?, ?)";
+					jdbcTemplate.update(updateGenresSql, newFilm.getId(), genre.getId());
 				} else {
 					throw new NotFoundException("Invalid genre id: " + (genre != null ? genre.getId() : "null"));
 				}
@@ -360,7 +360,7 @@ public class FilmRepository extends BaseRepository<Film> {
                 "LEFT JOIN directors dir ON fdir.director_id = dir.id " +
                 "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
                 "WHERE f.name ILIKE ? OR dir.name ILIKE ? " +
-                "ORDER BY f.id;";
+				"ORDER BY f.id;";
 
         return jdbcTemplate.query(sql, new FilmResultSetExtractor(), "%" + query + "%", "%" + query + "%");
     }
