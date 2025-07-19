@@ -169,13 +169,13 @@ public class UserRepository extends BaseRepository<User> {
                 "LEFT JOIN rating r ON f.rating_id = r.id " +
                 "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
                 "WHERE f.id IN (" +
-                "SELECT film_id " +
-                "FROM film_likes " +
-                "WHERE user_id = ? AND film_id NOT IN (" +
-                "SELECT film_id " +
-                "FROM film_likes " +
-                "WHERE user_id = ?" +
-                ")" +
+	                "SELECT film_id " +
+	                "FROM film_likes " +
+	                "WHERE user_id = ? AND film_id NOT IN (" +
+		                "SELECT film_id " +
+		                "FROM film_likes " +
+		                "WHERE user_id = ?" +
+						")" +
                 ")";
 
         return jdbcTemplate.query(recommendedFilmsQuery, new FilmResultSetExtractor(), similarUserId, userId);

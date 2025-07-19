@@ -67,7 +67,6 @@ public class FilmRepository extends BaseRepository<Film> {
         super(jdbcTemplate, mapper);
     }
 
-
     public Optional<Film> getFilmById(long filmId) {
         return findOneWithExtractor(GET_FILM_BY_ID, filmId);
     }
@@ -186,12 +185,8 @@ public class FilmRepository extends BaseRepository<Film> {
 		jdbcTemplate.update("DELETE FROM films_genres WHERE film_id = ?", newFilm.getId());
 		if (newFilm.getGenres() != null && !newFilm.getGenres().isEmpty()) {
 			for (Genre genre : newFilm.getGenres()) {
-				if (genre != null && genre.getId() != null && isGenreExists(genre.getId())) {
-					String updateGenresSql = "INSERT INTO films_genres (film_id, genre_id) VALUES (?, ?)";
+				String updateGenresSql = "INSERT INTO films_genres (film_id, genre_id) VALUES (?, ?)";
 					jdbcTemplate.update(updateGenresSql, newFilm.getId(), genre.getId());
-				} else {
-					throw new NotFoundException("Invalid genre id: " + (genre != null ? genre.getId() : "null"));
-				}
 			}
 		}
 
