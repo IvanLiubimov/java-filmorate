@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 @Service
@@ -18,6 +20,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserValidator userValidator;
     protected final JdbcTemplate jdbcTemplate;
+    private final FeedService feedService;
 
 
     public void addFriend(Long id, long friendId) {
@@ -33,6 +36,7 @@ public class UserService {
             throw new NotFoundException("Пользователь с id " + friendId + " не найден.");
         }
         userRepository.addFriend(id, friendId);
+        feedService.addFriendEvent(id, friendId, FeedEventOperation.ADD);
     }
 
     public void deleteFriend(Long id, long friendId) {
@@ -46,6 +50,7 @@ public class UserService {
             throw new NotFoundException("Пользователь с id=" + friendId + " не найден");
         }
         userRepository.deleteFriend(id, friendId);
+        feedService.addFriendEvent(id, friendId, FeedEventOperation.REMOVE);
     }
 
     public Collection<User> showMutualFriends(Long id, long friendId) {
@@ -102,11 +107,15 @@ public class UserService {
         return count != null && count > 0;
     }
 
+    public Collection<Film> getRecommendedFilms(long userId) {
+        userValidator.userExists(userId);
+
+        Collection<Film> recommendedFilms = userRepository.getRecommendedFilms(userId);
+        return recommendedFilms;
+    }
+
 	public void deleteUser(Long userId) {
 		userRepository.deleteUser(userId);
 	}
-
-
-
 }
 
