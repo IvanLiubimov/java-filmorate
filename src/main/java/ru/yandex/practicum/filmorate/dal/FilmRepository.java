@@ -285,14 +285,15 @@ public class FilmRepository extends BaseRepository<Film> {
     }
 
     public List<Film> getFilmByDirector(String query) {
-        String sql = "SELECT f.*, " +
-                "f.rating_id, " +
-                "r.name AS rating_name, " +
-                "fg.genre_id, " +
-                "g.name AS genre_name, " +
-                "fdir.director_id, " +
-                "dir.name AS director_name, " +
-                "fl.user_id AS like_user_id " +
+        String sql = ""
+        		+ "SELECT f.*, " +
+	                "f.rating_id, " +
+	                "r.name AS rating_name, " +
+	                "fg.genre_id, " +
+	                "g.name AS genre_name, " +
+	                "fdir.director_id, " +
+	                "dir.name AS director_name, " +
+	                "fl.user_id AS like_user_id " +
                 "FROM films f " +
                 "JOIN films_directors fd ON f.id = fd.film_id " +
                 "LEFT JOIN films_genres fg ON f.id = fg.film_id " +
@@ -308,14 +309,15 @@ public class FilmRepository extends BaseRepository<Film> {
     }
 
     public List<Film> getFilmByTitle(String query) {
-        String sql = "SELECT f.*, " +
-                "f.rating_id, " +
-                "r.name AS rating_name, " +
-                "fg.genre_id, " +
-                "g.name AS genre_name, " +
-                "fdir.director_id, " +
-                "dir.name AS director_name, " +
-                "fl.user_id AS like_user_id " +
+        String sql = ""
+        		+ "SELECT f.*, " +
+	                "f.rating_id, " +
+	                "r.name AS rating_name, " +
+	                "fg.genre_id, " +
+	                "g.name AS genre_name, " +
+	                "fdir.director_id, " +
+	                "dir.name AS director_name, " +
+	                "fl.user_id AS like_user_id " +
                 "FROM films f " +
                 "LEFT JOIN films_genres fg ON f.id = fg.film_id " +
                 "LEFT JOIN genres g ON fg.genre_id = g.genre_id " +
@@ -330,14 +332,15 @@ public class FilmRepository extends BaseRepository<Film> {
     }
 
     public List<Film> searchAll(String query) {
-        String sql = "SELECT f.*, " +
-                "f.rating_id, " +
-                "r.name AS rating_name, " +
-                "fg.genre_id, " +
-                "g.name AS genre_name, " +
-                "fdir.director_id, " +
-                "dir.name AS director_name, " +
-                "fl.user_id AS like_user_id " +
+        String sql = ""
+        		+ "SELECT f.*, " +
+	                "f.rating_id, " +
+	                "r.name AS rating_name, " +
+	                "fg.genre_id, " +
+	                "g.name AS genre_name, " +
+	                "fdir.director_id, " +
+	                "dir.name AS director_name, " +
+	                "fl.user_id AS like_user_id " +
                 "FROM films f " +
                 "LEFT JOIN films_genres fg ON f.id = fg.film_id " +
                 "LEFT JOIN genres g ON fg.genre_id = g.genre_id " +
