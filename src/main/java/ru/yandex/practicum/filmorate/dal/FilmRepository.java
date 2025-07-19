@@ -238,16 +238,21 @@ public class FilmRepository extends BaseRepository<Film> {
 
 	public Collection<Film> getCommonFilms(Long userId, Long friendId) {
 		String getCommonFilmsSql = ""
-				+ "SELECT f.*,"
-						+ "g.genre_id AS genre_id, "
-						+ "g.name AS genre_name, "
-						+ "r.name AS rating_name "
+				+ "SELECT "
+					+ "f.*, "
+					+ "g.genre_id AS genre_id, "
+					+ "g.name AS genre_name, "
+					+ "r.name AS rating_name, "
+					+ "fd.director_id, "
+					+ "d.name AS director_name "
 				+ "FROM films AS f "
-				+ "JOIN rating AS r ON f.rating_id = r.id "
-				+ "JOIN films_genres AS fg ON f.id = fg.film_id "
-				+ "JOIN genres AS g ON g.genre_id = fg.genre_id "
-				+ "JOIN film_likes AS fl1 ON fl1.film_id = f.id "
-				+ "JOIN film_likes AS fl2 ON fl2.film_id = f.id "
+				+ "LEFT JOIN rating AS r ON f.rating_id = r.id "
+				+ "LEFT JOIN films_genres AS fg ON f.id = fg.film_id "
+				+ "LEFT JOIN genres AS g ON g.genre_id = fg.genre_id "
+				+ "LEFT JOIN film_likes AS fl1 ON fl1.film_id = f.id "
+				+ "LEFT JOIN film_likes AS fl2 ON fl2.film_id = f.id "
+				+ "LEFT JOIN films_directors AS fd ON fd.film_id = f.id "
+				+ "LEFT JOIN directors AS d ON d.id = fd.director_id "
 				+ "WHERE fl1.user_id = ? AND fl2.user_id = ?";
 		return jdbcTemplate.query(getCommonFilmsSql, new FilmResultSetExtractor(), userId, friendId);
 	}
