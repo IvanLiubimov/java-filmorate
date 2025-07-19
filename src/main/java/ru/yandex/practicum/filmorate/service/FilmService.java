@@ -50,8 +50,8 @@ public class FilmService {
 		feedService.addLikeEvent(userId, filmId, FeedEventOperation.REMOVE);
 	}
 
-	public Collection<Film> mostPopular(Integer count) {
-		return filmRepository.mostPopular(count);
+	public Collection<Film> mostPopular(Integer count, Integer year, Integer genreId) {
+		return filmRepository.mostPopular(count, year, genreId);
 	}
 
 	public Collection<Film> getAllFilms() {
