@@ -1,11 +1,18 @@
 package ru.yandex.practicum.filmorate.service;
 
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 
 import org.springframework.dao.DataAccessException;
 
 import org.springframework.stereotype.Service;
+
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
@@ -14,6 +21,7 @@ import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
 import ru.yandex.practicum.filmorate.validator.DirectorValidator;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
+
 
 import java.util.Collection;
 import java.util.List;
@@ -110,4 +118,7 @@ public class FilmService {
         return filmRepository.searchAll(query);
     }
 
+	public void deleteFilm(Long filmId) {
+		filmRepository.deleteFilm(filmId);
+	}
 }
