@@ -19,10 +19,14 @@ import java.util.Objects;
 public class ReviewRepository implements ReviewStorage {
     private final JdbcTemplate jdbcTemplate;
 
+    
     @Override
     public Review create(Review review) {
-        String sql = "INSERT INTO reviews (content, is_positive, user_id, film_id) " +
-                "VALUES (?, ?, ?, ?)";
+
+        review.setReviewId(null);
+
+        String sql = "INSERT INTO reviews (content, is_positive, user_id, film_id, useful) " +
+                "VALUES (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -31,12 +35,18 @@ public class ReviewRepository implements ReviewStorage {
             stmt.setBoolean(2, review.getIsPositive());
             stmt.setLong(3, review.getUserId());
             stmt.setLong(4, review.getFilmId());
+            stmt.setInt(5, review.getUseful() != null ? review.getUseful() : 0);
             return stmt;
         }, keyHolder);
 
-        review.setReviewId(Objects.requireNonNull(keyHolder.getKey()).longValue());
-        return getById(review.getReviewId());
+
+        Long generatedId = Objects.requireNonNull(keyHolder.getKey()).longValue();
+        review.setReviewId(generatedId);
+
+        return review;
+
     }
+
 
     @Override
     public Review update(Review review) {
