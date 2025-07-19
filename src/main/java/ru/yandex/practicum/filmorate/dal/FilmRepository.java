@@ -22,8 +22,8 @@ public class FilmRepository extends BaseRepository<Film> {
     FilmResultSetExtractor filmResultSetExtractor = new FilmResultSetExtractor();
 
     private static final String DELETE_FILM = ""
-    		+ "DELETE"
-    		+ "FROM films"
+    		+ "DELETE "
+    		+ "FROM films "
     		+ "WHERE id = ?";
     private static final String FIND_ALL_FILMS = "SELECT f.*, " +
             "f.rating_id, " +
@@ -308,7 +308,7 @@ public class FilmRepository extends BaseRepository<Film> {
                 "ORDER BY f.id;";
 
         return jdbcTemplate.query(sql, new FilmResultSetExtractor(), "%" + query + "%", "%" + query + "%");
-	}
+    }
 
 	public void deleteFilm(Long filmId) {
 		delete(DELETE_FILM, filmId);

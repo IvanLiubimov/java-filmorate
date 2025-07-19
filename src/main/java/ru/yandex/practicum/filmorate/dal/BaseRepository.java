@@ -71,7 +71,7 @@ public class BaseRepository<T> {
 	protected void delete(String query, Object... params) {
 		int rowsUpdated = jdbcTemplate.update(query, params);
 		if (rowsUpdated == 0) {
-			throw new NotFoundException("Не удалось удалить данные");
+			throw new NotFoundException("Не удалось удалить данные.");
 		}
 	}
 }
