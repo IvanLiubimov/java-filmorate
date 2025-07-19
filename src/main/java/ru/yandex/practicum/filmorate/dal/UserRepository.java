@@ -53,8 +53,8 @@ public class UserRepository extends BaseRepository<User> {
     public User createUser(User user) {
         long id = create(CREATE_USER,
                 user.getName(),
+				user.getLogin(),
                 user.getEmail(),
-                user.getLogin(),
                 Date.valueOf(user.getBirthday()));
         user.setId(id);
         return user;
@@ -130,7 +130,7 @@ public class UserRepository extends BaseRepository<User> {
 								+ "FROM users "
 								+ "WHERE id = ?";
 		return jdbcTemplate.queryForObject(isUserExistsSql, Boolean.class);
-		}
+	}
 
     public Collection<Film> getRecommendedFilms(long userId) {
         // 1. Находим пользователей с максимальным пересечением по лайкам

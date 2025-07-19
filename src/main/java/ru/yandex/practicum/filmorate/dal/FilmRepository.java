@@ -1,20 +1,21 @@
 package ru.yandex.practicum.filmorate.dal;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+
+import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.dal.mapper.FilmResultSetExtractor;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Repository
@@ -130,7 +131,6 @@ public class FilmRepository extends BaseRepository<Film> {
 
     }
 
-
     public Collection<Film> getAllFilms() {
         return jdbcTemplate.query(FIND_ALL_FILMS, new FilmResultSetExtractor());
     }
@@ -183,8 +183,19 @@ public class FilmRepository extends BaseRepository<Film> {
                 newFilm.getId()
         );
 
-        jdbcTemplate.update("DELETE FROM films_directors WHERE film_id = ?", newFilm.getId());
+		jdbcTemplate.update("DELETE FROM films_genres WHERE film_id = ?", newFilm.getId());
+		if (newFilm.getGenres() != null && !newFilm.getGenres().isEmpty()) {
+			for (Genre genre : newFilm.getGenres()) {
+				if (genre != null && genre.getId() != null && isGenreExists(genre.getId())) {
+					jdbcTemplate.update("INSERT INTO films_genres (film_id, genre_id) VALUES (?, ?)", newFilm.getId(),
+							genre.getId());
+				} else {
+					throw new NotFoundException("Invalid genre id: " + (genre != null ? genre.getId() : "null"));
+				}
+			}
+		}
 
+		jdbcTemplate.update("DELETE FROM films_directors WHERE film_id = ?", newFilm.getId());
         if (newFilm.getDirectors() != null) {
             for (Director director : newFilm.getDirectors()) {
                 jdbcTemplate.update("INSERT INTO films_directors (film_id, director_id) VALUES (?, ?)",
@@ -285,14 +296,15 @@ public class FilmRepository extends BaseRepository<Film> {
     }
 
     public List<Film> getFilmByDirector(String query) {
-        String sql = "SELECT f.*, " +
-                "f.rating_id, " +
-                "r.name AS rating_name, " +
-                "fg.genre_id, " +
-                "g.name AS genre_name, " +
-                "fdir.director_id, " +
-                "dir.name AS director_name, " +
-                "fl.user_id AS like_user_id " +
+        String sql = ""
+        		+ "SELECT f.*, " +
+	                "f.rating_id, " +
+	                "r.name AS rating_name, " +
+	                "fg.genre_id, " +
+	                "g.name AS genre_name, " +
+	                "fdir.director_id, " +
+	                "dir.name AS director_name, " +
+	                "fl.user_id AS like_user_id " +
                 "FROM films f " +
                 "JOIN films_directors fd ON f.id = fd.film_id " +
                 "LEFT JOIN films_genres fg ON f.id = fg.film_id " +
@@ -308,14 +320,15 @@ public class FilmRepository extends BaseRepository<Film> {
     }
 
     public List<Film> getFilmByTitle(String query) {
-        String sql = "SELECT f.*, " +
-                "f.rating_id, " +
-                "r.name AS rating_name, " +
-                "fg.genre_id, " +
-                "g.name AS genre_name, " +
-                "fdir.director_id, " +
-                "dir.name AS director_name, " +
-                "fl.user_id AS like_user_id " +
+        String sql = ""
+        		+ "SELECT f.*, " +
+	                "f.rating_id, " +
+	                "r.name AS rating_name, " +
+	                "fg.genre_id, " +
+	                "g.name AS genre_name, " +
+	                "fdir.director_id, " +
+	                "dir.name AS director_name, " +
+	                "fl.user_id AS like_user_id " +
                 "FROM films f " +
                 "LEFT JOIN films_genres fg ON f.id = fg.film_id " +
                 "LEFT JOIN genres g ON fg.genre_id = g.genre_id " +
@@ -330,14 +343,15 @@ public class FilmRepository extends BaseRepository<Film> {
     }
 
     public List<Film> searchAll(String query) {
-        String sql = "SELECT f.*, " +
-                "f.rating_id, " +
-                "r.name AS rating_name, " +
-                "fg.genre_id, " +
-                "g.name AS genre_name, " +
-                "fdir.director_id, " +
-                "dir.name AS director_name, " +
-                "fl.user_id AS like_user_id " +
+        String sql = ""
+        		+ "SELECT f.*, " +
+	                "f.rating_id, " +
+	                "r.name AS rating_name, " +
+	                "fg.genre_id, " +
+	                "g.name AS genre_name, " +
+	                "fdir.director_id, " +
+	                "dir.name AS director_name, " +
+	                "fl.user_id AS like_user_id " +
                 "FROM films f " +
                 "LEFT JOIN films_genres fg ON f.id = fg.film_id " +
                 "LEFT JOIN genres g ON fg.genre_id = g.genre_id " +
