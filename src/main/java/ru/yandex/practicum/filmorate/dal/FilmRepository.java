@@ -1,25 +1,30 @@
 package ru.yandex.practicum.filmorate.dal;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+
+import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.dal.mapper.FilmResultSetExtractor;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
 @Slf4j
 @Repository
 public class FilmRepository extends BaseRepository<Film> {
     FilmResultSetExtractor filmResultSetExtractor = new FilmResultSetExtractor();
 
+    private static final String DELETE_FILM = ""
+    		+ "DELETE "
+    		+ "FROM films "
+    		+ "WHERE id = ?";
     private static final String FIND_ALL_FILMS = "SELECT f.*, " +
             "f.rating_id, " +
             "r.name AS rating_name, " +
@@ -304,4 +309,8 @@ public class FilmRepository extends BaseRepository<Film> {
 
         return jdbcTemplate.query(sql, new FilmResultSetExtractor(), "%" + query + "%", "%" + query + "%");
     }
+
+	public void deleteFilm(Long filmId) {
+		delete(DELETE_FILM, filmId);
+	}
 }

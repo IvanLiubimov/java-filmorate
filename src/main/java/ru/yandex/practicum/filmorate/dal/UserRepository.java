@@ -1,19 +1,20 @@
 package ru.yandex.practicum.filmorate.dal;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dal.mapper.FilmResultSetExtractor;
-import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
-
 import java.sql.Date;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
+
+import ru.yandex.practicum.filmorate.dal.mapper.FilmResultSetExtractor;
+import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
 
 @Repository
@@ -22,6 +23,7 @@ public class UserRepository extends BaseRepository<User> {
     private static final String CREATE_USER = "INSERT INTO users(name, login, email, birthday) " + "VALUES (?, ?, ?, ?)";
     private static final String FIND_USER_BY_ID = "SELECT * FROM users WHERE id = ?";
     private static final String UPDATE_USER = "UPDATE users SET  email = ?, login = ?, name = ?, birthday = ?  WHERE id = ?";
+	private static final String DELETE_USER = "DELETE FROM users WHERE id = ?";
 
     public UserRepository(JdbcTemplate jdbc, @Qualifier("userMapper") RowMapper<User> mapper) {
         super(jdbc, mapper);
@@ -138,5 +140,8 @@ public class UserRepository extends BaseRepository<User> {
         return jdbcTemplate.query(recommendedFilmsQuery, new FilmResultSetExtractor(), similarUserId, userId);
     }
 
+	public void deleteUser(Long userId) {
+		delete(DELETE_USER, userId);
+	}
 }
 
