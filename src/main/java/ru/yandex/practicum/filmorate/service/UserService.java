@@ -111,8 +111,6 @@ public class UserService {
         userValidator.userExists(userId);
 
         Collection<Film> recommendedFilms = userRepository.getRecommendedFilms(userId);
-
-
         return recommendedFilms;
     }
 

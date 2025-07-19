@@ -1,5 +1,4 @@
 package ru.yandex.practicum.filmorate.controller;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -30,8 +29,8 @@ public class FilmController {
     private final FilmService filmService;
     private final ReviewService reviewService;
 
-    @GetMapping
-    public Collection<Film> getAllFilms() {
+	@GetMapping
+	public Collection<Film> getAllFilms() {
         log.info("Получен HTTP запрос вывод списка фильмов");
         return filmService.getAllFilms();
     }
@@ -115,6 +114,11 @@ public class FilmController {
 		filmService.deleteFilm(id);
 		log.info("Пользователь успешно удален, id: {}", id);
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/common")
+	public Collection<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+		return filmService.getCommonFilms(userId, friendId);
 	}
 }
 
