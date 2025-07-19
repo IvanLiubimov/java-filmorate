@@ -103,7 +103,7 @@ public class FilmRepository extends BaseRepository<Film> {
         LEFT JOIN directors AS dir ON fdir.director_id = dir.id
         LEFT JOIN film_likes AS fl ON f.id = fl.film_id
         WHERE 1=1 -- Добавляем условие 1=1 для упрощения добавления дальнейших условий
-    """);List<Object> params = new ArrayList<>(); // Список параметров для PreparedStatement
+    """);List<Object> params = new ArrayList<>();
 
         if (year != null) {
             query.append(" AND EXTRACT(YEAR FROM f.releaseDate) = ?");
