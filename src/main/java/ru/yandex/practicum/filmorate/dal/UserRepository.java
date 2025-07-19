@@ -157,26 +157,29 @@ public class UserRepository extends BaseRepository<User> {
         long similarUserId = similarUserIds.get(0);
 
         // 3. Находим фильмы, которые понравились похожему пользователю, но не текущему
-        String recommendedFilmsQuery = "SELECT f.*, " +
-                "f.rating_id, " +
-                "fg.genre_id, " +
-                "g.name AS genre_name, " +
-                "fl.user_id AS like_user_id, " +
-                "r.name AS rating_name " +
-                "FROM films f " +
-                "LEFT JOIN films_genres fg ON f.id = fg.film_id " +
-                "LEFT JOIN genres g ON fg.genre_id = g.genre_id " +
-                "LEFT JOIN rating r ON f.rating_id = r.id " +
-                "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
-                "WHERE f.id IN (" +
-                "SELECT film_id " +
-                "FROM film_likes " +
-                "WHERE user_id = ? AND film_id NOT IN (" +
-                "SELECT film_id " +
-                "FROM film_likes " +
-                "WHERE user_id = ?" +
-                ")" +
-                ")";
+        String recommendedFilmsQuery = """
+                SELECT f.*,
+                       fg.genre_id,
+                       g.name AS genre_name,
+                       fl.user_id AS like_user_id,
+                       r.name AS rating_name,
+                       fdir.director_id,
+                       dir.name AS director_name
+                FROM films f
+                LEFT JOIN films_genres fg ON f.id = fg.film_id
+                LEFT JOIN genres g ON fg.genre_id = g.genre_id
+                LEFT JOIN rating r ON f.rating_id = r.id
+                LEFT JOIN film_likes fl ON f.id = fl.film_id
+                LEFT JOIN films_directors fdir ON f.id = fdir.film_id
+                LEFT JOIN directors dir ON fdir.director_id = dir.id
+                WHERE f.id IN (
+                    SELECT film_id
+                    FROM film_likes
+                    WHERE user_id = ?
+                      AND film_id NOT IN (
+                          SELECT film_id FROM film_likes WHERE user_id = ?
+                      )
+                )""";
 
         return jdbcTemplate.query(recommendedFilmsQuery, new FilmResultSetExtractor(), similarUserId, userId);
     }
