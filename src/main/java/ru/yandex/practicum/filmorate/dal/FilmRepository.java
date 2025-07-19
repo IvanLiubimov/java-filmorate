@@ -360,7 +360,7 @@ public class FilmRepository extends BaseRepository<Film> {
                 "LEFT JOIN directors dir ON fdir.director_id = dir.id " +
                 "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
                 "WHERE f.name ILIKE ? OR dir.name ILIKE ? " +
-				"ORDER BY f.id;";
+				"ORDER BY f.id DESC;";
 
         return jdbcTemplate.query(sql, new FilmResultSetExtractor(), "%" + query + "%", "%" + query + "%");
     }
