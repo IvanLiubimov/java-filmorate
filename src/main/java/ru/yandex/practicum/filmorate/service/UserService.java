@@ -75,7 +75,6 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("Фильм с id " + userId + " не найден."));
     }
 
-
     public User createUser(User user) {
         userValidator.validate(user);
         if (isEmailExists(user.getEmail())) {
@@ -83,7 +82,6 @@ public class UserService {
         }
         return userRepository.createUser(user);
     }
-
 
     public User editUser(User newUser) {
         userValidator.validate(newUser);
@@ -109,7 +107,6 @@ public class UserService {
 
     public Collection<Film> getRecommendedFilms(long userId) {
         userValidator.userExists(userId);
-
         Collection<Film> recommendedFilms = userRepository.getRecommendedFilms(userId);
         return recommendedFilms;
     }
@@ -118,4 +115,3 @@ public class UserService {
 		userRepository.deleteUser(userId);
 	}
 }
-
