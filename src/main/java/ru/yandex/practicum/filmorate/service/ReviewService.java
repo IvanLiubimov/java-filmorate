@@ -72,6 +72,7 @@ public class ReviewService {
                     FeedEventOperation.UPDATE);
 
         return updatedReview;
+
     }
 
 
@@ -115,7 +116,7 @@ public class ReviewService {
         }
 
         reviewStorage.addLike(reviewId, userId);
-        feedService.addReviewLikeEvent(userId, reviewId, FeedEventOperation.ADD);
+
     }
 
 
@@ -128,7 +129,7 @@ public class ReviewService {
         }
 
         reviewStorage.addDislike(reviewId, userId);
-        feedService.addReviewLikeEvent(userId, reviewId, FeedEventOperation.REMOVE);
+
     }
 
     public void removeLike(Long reviewId, Long userId) {
@@ -138,8 +139,8 @@ public class ReviewService {
         boolean hadLike = reviewStorage.hasUserLike(reviewId, userId);
         reviewStorage.removeLike(reviewId, userId);
 
-        if (hadLike) {
-            feedService.addReviewLikeEvent(userId, reviewId, FeedEventOperation.ADD);
+       if (hadLike) {
+
         }
     }
 
@@ -150,9 +151,7 @@ public class ReviewService {
         boolean hadDislike = reviewStorage.hasUserDislike(reviewId, userId);
         reviewStorage.removeDislike(reviewId, userId);
 
-        if (hadDislike) {
-            feedService.addReviewLikeEvent(userId, reviewId, FeedEventOperation.REMOVE);
-        }
+       
     }
 
 }

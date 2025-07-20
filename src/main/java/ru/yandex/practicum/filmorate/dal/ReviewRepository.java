@@ -7,6 +7,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
+import ru.yandex.practicum.filmorate.service.FeedService;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 import java.sql.PreparedStatement;
@@ -19,6 +21,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ReviewRepository implements ReviewStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final FeedService feedService;
 
     @Override
     public Review create(Review review) {
@@ -38,6 +41,7 @@ public class ReviewRepository implements ReviewStorage {
 
         Long generatedId = Objects.requireNonNull(keyHolder.getKey()).longValue();
         review.setReviewId(generatedId);
+
         return review;
     }
 
@@ -48,13 +52,18 @@ public class ReviewRepository implements ReviewStorage {
                 review.getContent(),
                 review.getIsPositive(),
                 review.getReviewId());
+
+
         return getById(review.getReviewId());
     }
 
     @Override
     public void delete(Long id) {
+        Review review = getById(id);
         String sql = "DELETE FROM reviews WHERE review_id = ?";
         jdbcTemplate.update(sql, id);
+
+
     }
 
     @Override
@@ -85,6 +94,7 @@ public class ReviewRepository implements ReviewStorage {
         String sql = "MERGE INTO review_ratings (review_id, user_id, is_positive) " +
                 "KEY (review_id, user_id) VALUES (?, ?, true)";
         jdbcTemplate.update(sql, reviewId, userId);
+
         updateUsefulness(reviewId);
     }
 
@@ -96,6 +106,7 @@ public class ReviewRepository implements ReviewStorage {
         String sql = "MERGE INTO review_ratings (review_id, user_id, is_positive) " +
                 "KEY (review_id, user_id) VALUES (?, ?, false)";
         jdbcTemplate.update(sql, reviewId, userId);
+
         updateUsefulness(reviewId);
     }
 
@@ -103,6 +114,7 @@ public class ReviewRepository implements ReviewStorage {
     public void removeLike(Long reviewId, Long userId) {
         String sql = "DELETE FROM review_ratings WHERE review_id = ? AND user_id = ? AND is_positive = true";
         jdbcTemplate.update(sql, reviewId, userId);
+
         updateUsefulness(reviewId);
     }
 
@@ -110,6 +122,7 @@ public class ReviewRepository implements ReviewStorage {
     public void removeDislike(Long reviewId, Long userId) {
         String sql = "DELETE FROM review_ratings WHERE review_id = ? AND user_id = ? AND is_positive = false";
         jdbcTemplate.update(sql, reviewId, userId);
+
         updateUsefulness(reviewId);
     }
 
