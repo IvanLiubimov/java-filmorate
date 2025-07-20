@@ -3,11 +3,13 @@ package ru.yandex.practicum.filmorate.service;
 import java.util.Collection;
 import java.util.List;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
+import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -40,6 +42,10 @@ public class FilmService {
 		feedService.addLikeEvent(userId, filmId, FeedEventOperation.ADD);
 	}
 
+
+
+
+
 	public void deleteLike(Long filmId, Long userId) {
 		if (!filmValidator.filmExists(filmId)) {
 			throw new NotFoundException("Пользователь с id " + filmId + " не найден.");
@@ -47,9 +53,12 @@ public class FilmService {
 		if (!userValidator.userExists(userId)) {
 			throw new NotFoundException("Пользователь с id=" + userId + " не найден");
 		}
+
 		filmRepository.deleteLike(filmId, userId);
 		feedService.addLikeEvent(userId, filmId, FeedEventOperation.REMOVE);
 	}
+
+
 
 	public Collection<Film> mostPopular(Integer count, Integer year, Integer genreId) {
 		return filmRepository.mostPopular(count, year, genreId);
