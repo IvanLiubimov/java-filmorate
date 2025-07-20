@@ -33,6 +33,7 @@ public class ReviewController {
         return reviewService.getById(id);
     }
 
+
     @GetMapping
     public List<Review> getByFilmId(
             @RequestParam(required = false) Long filmId,
@@ -52,6 +53,11 @@ public class ReviewController {
 
     @DeleteMapping("/{id}/like/{userId}")
     public void removeLike(@PathVariable Long id, @PathVariable Long userId) {
-        reviewService.removeLikeDislike(id, userId);
+        reviewService.removeLike(id, userId);
+    }
+
+    @DeleteMapping("/{id}/dislike/{userId}")
+    public void removeDislike(@PathVariable Long id, @PathVariable Long userId) {
+        reviewService.removeDislike(id, userId);
     }
 }
