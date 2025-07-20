@@ -23,5 +23,5 @@ public class Review {
     @NotNull
     private Long filmId;
     @Builder.Default
-    private Integer useful = 0; // Рейтинг полезности
+    private Integer useful = 0;
 }

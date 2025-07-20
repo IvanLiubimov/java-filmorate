@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.dal;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -19,12 +20,8 @@ import java.util.Objects;
 public class ReviewRepository implements ReviewStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    
     @Override
     public Review create(Review review) {
-
-        review.setReviewId(null);
-
         String sql = "INSERT INTO reviews (content, is_positive, user_id, film_id, useful) " +
                 "VALUES (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -39,14 +36,10 @@ public class ReviewRepository implements ReviewStorage {
             return stmt;
         }, keyHolder);
 
-
         Long generatedId = Objects.requireNonNull(keyHolder.getKey()).longValue();
         review.setReviewId(generatedId);
-
         return review;
-
     }
-
 
     @Override
     public Review update(Review review) {
@@ -73,6 +66,7 @@ public class ReviewRepository implements ReviewStorage {
         return jdbcTemplate.queryForObject(sql, this::mapRowToReview, id);
     }
 
+
     @Override
     public List<Review> getByFilmId(Long filmId, int count) {
         String sql = "SELECT r.*, " +
@@ -85,45 +79,36 @@ public class ReviewRepository implements ReviewStorage {
 
     @Override
     public void addLike(Long reviewId, Long userId) {
-        // Сначала проверяем существование записи
-        String checkSql = "SELECT COUNT(*) FROM review_ratings WHERE review_id = ? AND user_id = ?";
-        int count = jdbcTemplate.queryForObject(checkSql, Integer.class, reviewId, userId);
+        // Удаляем возможный дизлайк перед добавлением лайка
+        removeDislike(reviewId, userId);
 
-        if (count > 0) {
-            // Обновляем существующую запись
-            String updateSql = "UPDATE review_ratings SET is_positive = true WHERE review_id = ? AND user_id = ?";
-            jdbcTemplate.update(updateSql, reviewId, userId);
-        } else {
-            // Вставляем новую запись
-            String insertSql = "INSERT INTO review_ratings (review_id, user_id, is_positive) VALUES (?, ?, true)";
-            jdbcTemplate.update(insertSql, reviewId, userId);
-        }
-
-        // Обновляем счетчик полезности
+        String sql = "MERGE INTO review_ratings (review_id, user_id, is_positive) " +
+                "KEY (review_id, user_id) VALUES (?, ?, true)";
+        jdbcTemplate.update(sql, reviewId, userId);
         updateUsefulness(reviewId);
     }
 
     @Override
     public void addDislike(Long reviewId, Long userId) {
-        // Сначала пробуем обновить
-        int updated = jdbcTemplate.update(
-                "UPDATE review_ratings SET is_positive = false WHERE review_id = ? AND user_id = ?",
-                reviewId, userId
-        );
+        // Удаляем возможный лайк перед добавлением дизлайка
+        removeLike(reviewId, userId);
 
-        // Если не было строк для обновления - вставляем новую
-        if (updated == 0) {
-            jdbcTemplate.update(
-                    "INSERT INTO review_ratings (review_id, user_id, is_positive) VALUES (?, ?, false)",
-                    reviewId, userId
-            );
-        }
+        String sql = "MERGE INTO review_ratings (review_id, user_id, is_positive) " +
+                "KEY (review_id, user_id) VALUES (?, ?, false)";
+        jdbcTemplate.update(sql, reviewId, userId);
         updateUsefulness(reviewId);
     }
 
     @Override
-    public void removeLikeDislike(Long reviewId, Long userId) {
-        String sql = "DELETE FROM review_ratings WHERE review_id = ? AND user_id = ?";
+    public void removeLike(Long reviewId, Long userId) {
+        String sql = "DELETE FROM review_ratings WHERE review_id = ? AND user_id = ? AND is_positive = true";
+        jdbcTemplate.update(sql, reviewId, userId);
+        updateUsefulness(reviewId);
+    }
+
+    @Override
+    public void removeDislike(Long reviewId, Long userId) {
+        String sql = "DELETE FROM review_ratings WHERE review_id = ? AND user_id = ? AND is_positive = false";
         jdbcTemplate.update(sql, reviewId, userId);
         updateUsefulness(reviewId);
     }
@@ -132,6 +117,20 @@ public class ReviewRepository implements ReviewStorage {
     public boolean existsById(Long reviewId) {
         String sql = "SELECT COUNT(*) FROM reviews WHERE review_id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, reviewId);
+        return count != null && count > 0;
+    }
+
+    @Override
+    public boolean hasUserLike(Long reviewId, Long userId) {
+        String sql = "SELECT COUNT(*) FROM review_ratings WHERE review_id = ? AND user_id = ? AND is_positive = true";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, reviewId, userId);
+        return count != null && count > 0;
+    }
+
+    @Override
+    public boolean hasUserDislike(Long reviewId, Long userId) {
+        String sql = "SELECT COUNT(*) FROM review_ratings WHERE review_id = ? AND user_id = ? AND is_positive = false";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, reviewId, userId);
         return count != null && count > 0;
     }
 
@@ -155,12 +154,8 @@ public class ReviewRepository implements ReviewStorage {
     }
 
     @Override
-    public boolean wasLike(Long userId, Long reviewId) {
-        String sql = "SELECT is_positive FROM review_ratings WHERE review_id = ? AND user_id = ?";
-        try {
-            return jdbcTemplate.queryForObject(sql, Boolean.class, reviewId, userId);
-        } catch (Exception e) {
-            return false;
-        }
+    public void removeAllRatingsForReview(Long reviewId) {
+        String sql = "DELETE FROM review_ratings WHERE review_id = ?";
+        jdbcTemplate.update(sql, reviewId);
     }
 }

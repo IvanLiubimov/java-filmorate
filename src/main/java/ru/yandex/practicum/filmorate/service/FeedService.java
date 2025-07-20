@@ -1,9 +1,9 @@
 package ru.yandex.practicum.filmorate.service;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.FeedRepository;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
 import ru.yandex.practicum.filmorate.model.enums.FeedEventType;
@@ -17,10 +17,13 @@ public class FeedService {
     private final FeedRepository feedRepository;
     private final UserValidator userValidator;
 
-    public Collection<FeedEvent> getUserFeed(Long userId) {
-        userValidator.userExists(userId);
-        return feedRepository.findByUserId(userId);
-    }
+
+   public Collection<FeedEvent> getUserFeed(Long userId) {
+       if (!userValidator.userExists(userId)) {
+           throw new NotFoundException("User with id " + userId + " not found");
+       }
+       return feedRepository.findByUserId(userId);
+   }
 
     public void addLikeEvent(Long userId, Long filmId, FeedEventOperation operation) {
         FeedEvent event = FeedEvent.builder()
@@ -28,7 +31,6 @@ public class FeedService {
                 .eventType(FeedEventType.LIKE)
                 .operation(operation)
                 .entityId(filmId)
-                //.timestamp(Instant.now())
                 .timestamp(System.currentTimeMillis())
                 .build();
         feedRepository.save(event);
@@ -56,12 +58,13 @@ public class FeedService {
         feedRepository.save(event);
     }
 
-    public void addLikeToReviewEvent(Long userId, Long reviewId, FeedEventOperation operation) {
+    public void addReviewLikeEvent(Long userId, Long reviewId, FeedEventOperation operation) {
+        // Убедимся, что для лайков/дизлайков отзывов используется REVIEW
         FeedEvent event = FeedEvent.builder()
                 .userId(userId)
-                .eventType(FeedEventType.LIKE)
+                .eventType(FeedEventType.REVIEW)  // Важно: REVIEW, а не LIKE
                 .operation(operation)
-                .entityId(reviewId)
+                .entityId(reviewId)  // Важно: ID отзыва, а не пользователя/фильма
                 .timestamp(System.currentTimeMillis())
                 .build();
         feedRepository.save(event);

@@ -81,53 +81,69 @@ public class FilmRepository extends BaseRepository<Film> {
         jdbcTemplate.update(query, userId, filmId);
     }
 
+
     public Collection<Film> mostPopular(Integer count, Integer year, Integer genreId) {
         StringBuilder query = new StringBuilder("""
-        SELECT f.id,
-               f.name,
-               f.description,
-               f.releaseDate,
-               f.duration,
-               f.rating_id,
-               r.name AS rating_name,
-               fg.genre_id AS genre_id,
-               g.name AS genre_name,
-               fdir.director_id,
-               dir.name AS director_name,
-               COUNT(fl.user_id) AS like_count
+    WITH top_films AS (
+        SELECT f.id
         FROM films f
-        LEFT JOIN films_genres AS fg ON f.id = fg.film_id
-        LEFT JOIN genres AS g ON fg.genre_id = g.genre_id
-        LEFT JOIN rating r ON f.rating_id = r.id
-        LEFT JOIN films_directors AS fdir ON f.id = fdir.film_id
-        LEFT JOIN directors AS dir ON fdir.director_id = dir.id
-        LEFT JOIN film_likes AS fl ON f.id = fl.film_id
-        WHERE 1=1 -- Добавляем условие 1=1 для упрощения добавления дальнейших условий
-    """);List<Object> params = new ArrayList<>();
+        LEFT JOIN film_likes fl ON f.id = fl.film_id
+""");
+
+        List<Object> params = new ArrayList<>();
 
         if (year != null) {
-            query.append(" AND EXTRACT(YEAR FROM f.releaseDate) = ?");
+            query.append(" WHERE EXTRACT(YEAR FROM f.releaseDate) = ?");
             params.add(year);
         }
 
         if (genreId != null) {
-            query.append(" AND fg.genre_id = ?");
+            if (year == null) query.append(" WHERE");
+            else query.append(" AND");
+
+            query.append("""
+        f.id IN (
+            SELECT fg.film_id FROM films_genres fg WHERE fg.genre_id = ?
+        )
+    """);
             params.add(genreId);
         }
 
         query.append("""
-    GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, f.rating_id,
-             r.name, fg.genre_id, g.name, fdir.director_id, dir.name
+        GROUP BY f.id
+        ORDER BY COUNT(fl.user_id) DESC
+        LIMIT ?
+    )
+    SELECT f.id,
+           f.name,
+           f.description,
+           f.releaseDate,
+           f.duration,
+           f.rating_id,
+           r.name AS rating_name,
+           fg.genre_id,
+           g.name AS genre_name,
+           fdir.director_id,
+           dir.name AS director_name,
+           COALESCE(l.like_count, 0) AS like_count
+    FROM films f
+    JOIN top_films tf ON f.id = tf.id
+    LEFT JOIN films_genres fg ON f.id = fg.film_id
+    LEFT JOIN genres g ON fg.genre_id = g.genre_id
+    LEFT JOIN rating r ON f.rating_id = r.id
+    LEFT JOIN films_directors fdir ON f.id = fdir.film_id
+    LEFT JOIN directors dir ON fdir.director_id = dir.id
+    LEFT JOIN (
+        SELECT film_id, COUNT(user_id) AS like_count
+        FROM film_likes
+        GROUP BY film_id
+    ) l ON f.id = l.film_id
     ORDER BY like_count DESC, f.id ASC
-    LIMIT ?
 """);
+
         params.add(count);
 
-        log.info("SQL Query: {}", query);
-        log.info("Params: {}", params);
-
-        return jdbcTemplate.query(query.toString(), filmResultSetExtractor, params.toArray());
-
+        return jdbcTemplate.query(query.toString(), new FilmResultSetExtractor(), params.toArray());
     }
 
     public Collection<Film> getAllFilms() {

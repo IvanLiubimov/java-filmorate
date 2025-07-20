@@ -50,4 +50,13 @@ public class GlobalExceptionHandler {
                 .error("Internal server error") // Не показываем детали клиенту
                 .build();
     }
+
+   /* @ExceptionHandler(ReviewNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleReviewNotFound(ReviewNotFoundException ex) {
+        return ErrorResponse.builder()
+                .errorCode(HttpStatus.NOT_FOUND.value())
+                .error(ex.getMessage())
+                .build();
+    }*/
 }
