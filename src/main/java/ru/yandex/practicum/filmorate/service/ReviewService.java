@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -65,11 +66,14 @@ public class ReviewService {
         }
 
         Review updatedReview = reviewStorage.update(review);
-       feedService.addReviewEvent(updatedReview.getUserId(),
-                updatedReview.getReviewId(),
-                FeedEventOperation.UPDATE);
+
+            feedService.addReviewEvent(updatedReview.getUserId(),
+                    updatedReview.getReviewId(),
+                    FeedEventOperation.UPDATE);
+
         return updatedReview;
     }
+
 
     public void delete(Long id) {
         Review review = getById(id);
@@ -135,7 +139,7 @@ public class ReviewService {
         reviewStorage.removeLike(reviewId, userId);
 
         if (hadLike) {
-            feedService.addReviewLikeEvent(userId, reviewId, FeedEventOperation.REMOVE);
+            feedService.addReviewLikeEvent(userId, reviewId, FeedEventOperation.ADD);
         }
     }
 
@@ -147,7 +151,8 @@ public class ReviewService {
         reviewStorage.removeDislike(reviewId, userId);
 
         if (hadDislike) {
-            feedService.addReviewLikeEvent(userId, reviewId, FeedEventOperation.ADD);
+            feedService.addReviewLikeEvent(userId, reviewId, FeedEventOperation.REMOVE);
         }
     }
+
 }
