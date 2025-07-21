@@ -1,13 +1,14 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.Collection;
+
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
 import ru.yandex.practicum.filmorate.dal.DirectorRepository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.validator.DirectorValidator;
-
-import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,9 @@ public class DirectorService {
     }
 
     public Director updateDirector(Director newDirector) {
+		if (!directorValidator.directorExists(newDirector.getId())) {
+			throw new NotFoundException("Режиссер с id=" + newDirector.getId() + " не найден");
+		}
         directorValidator.validate(newDirector);
         return directorRepository.updateDirector(newDirector);
     }

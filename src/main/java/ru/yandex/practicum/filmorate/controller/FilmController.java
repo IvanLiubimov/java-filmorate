@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -46,25 +45,14 @@ public class FilmController {
     public List<Film> searchFilms(
             @RequestParam String query,
             @RequestParam(defaultValue = "title") String by) {
-        if (by.equals("director")) {
-            return filmService.getFilmByDirector(query);
-        } else if (by.equals("title")) {
-            return filmService.getFilmByTitle(query);
-        } else if (by.equals("title,director") || by.equals("director,title")) {
-            return filmService.searchAll(query);
-        } else {
-            throw new ConditionsNotMetException("Неверные параметры поиска");
-        }
+		return filmService.searchFilms(query, by);
     }
 
     @GetMapping("/director/{directorId}")
     public Collection<Film> getFilmsByDirector(
-            @PathVariable long directorId,
+			@PathVariable Long directorId,
             @RequestParam(defaultValue = "year") String sortBy) {
-        if (sortBy.equals("year")) {
-            return filmService.getFilmsByDirectorSortedByYears(directorId);
-        }
-        return filmService.getFilmsByDirectorSortedByLikes(directorId);
+		return filmService.getFilmsByDirector(directorId, sortBy);
     }
 
     @PostMapping

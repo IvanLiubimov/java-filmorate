@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
+import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -112,6 +113,25 @@ public class FilmService {
                 .stream()
                 .distinct()
 				.toList();
+	}
+
+	public List<Film> searchFilms(String query, String by) {
+		if (by.equals("director")) {
+			return getFilmByDirector(query);
+		} else if (by.equals("title")) {
+			return getFilmByTitle(query);
+		} else if (by.equals("title,director") || by.equals("director,title")) {
+			return searchAll(query);
+		} else {
+			throw new ConditionsNotMetException("Неверные параметры поиска");
+		}
+	}
+
+	public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
+		if (sortBy.equals("year")) {
+			return getFilmsByDirectorSortedByYears(directorId);
+		}
+		return getFilmsByDirectorSortedByLikes(directorId);
 	}
 }
 
