@@ -148,7 +148,7 @@ public class UserRepository extends BaseRepository<User> {
        return similarUserIds;
     }
 
-    public Collection<Film> getRecommendedFilms (List<Long> similarUserIds, long userId){
+    public Collection<Film> getRecommendedFilms(List<Long> similarUserIds, long userId) {
 
         String inSql = String.join(",", Collections.nCopies(similarUserIds.size(), "?"));
 
