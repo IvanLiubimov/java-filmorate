@@ -7,13 +7,13 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.dal.DirectorRepository;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
+import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
-import ru.yandex.practicum.filmorate.validator.DirectorValidator;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
@@ -25,8 +25,9 @@ public class FilmService {
 	private final FilmValidator filmValidator;
 	private final UserValidator userValidator;
 	private final FeedService feedService;
-	private final DirectorValidator directorValidator;
-	private final DirectorService directorService;
+	private final DirectorRepository directorRepository;
+
+	public static final int CINEMA_BIRTH_YEAR = 1895;
 
 	public Film getFilmById(long filmId) {
 		return filmRepository.getFilmById(filmId)
@@ -53,6 +54,15 @@ public class FilmService {
 	}
 
 	public Collection<Film> mostPopular(Integer count, Integer year, Integer genreId) {
+		if (count != null && count < 0) {
+			throw new ConditionsNotMetException("Нужное количество не может быть отрицательным");
+		}
+		if (genreId != null && genreId < 0) {
+			throw new ConditionsNotMetException("Айди жанра не может быть отрицательным");
+		}
+		if (year != null && year < CINEMA_BIRTH_YEAR) {
+			throw new ConditionsNotMetException("Год не может быть раньше появления кинематографа");
+		}
 		return filmRepository.mostPopular(count, year, genreId);
 	}
 
@@ -84,14 +94,14 @@ public class FilmService {
 	}
 
 	public List<Film> getFilmsByDirectorSortedByLikes(long directorId) {
-		Director director = directorService.getDirectorById(directorId);
-		directorValidator.validate(director);
+		if (!directorRepository.directorExists(directorId)) {
+			throw new NotFoundException("Такого режиссера у нас нет");
+		}
 		return filmRepository.getFilmsByDirectorSortedByLikes(directorId);
 	}
 
 	public List<Film> getFilmsByDirectorSortedByYears(long directorId) {
-		Director director = directorService.getDirectorById(directorId);
-		directorValidator.validate(director);
+		directorRepository.directorExists(directorId);
 		return filmRepository.getFilmsByDirectorSortedByYears(directorId);
 	}
 

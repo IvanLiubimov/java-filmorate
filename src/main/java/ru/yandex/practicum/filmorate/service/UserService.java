@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -105,10 +107,14 @@ public class UserService {
         return count != null && count > 0;
     }
 
-    public Collection<Film> getRecommendedFilms(long userId) {
+    public Collection<Film> getRecommendedFilms(long userId, int count) {
         userValidator.userExists(userId);
-        Collection<Film> recommendedFilms = userRepository.getRecommendedFilms(userId);
-        return recommendedFilms;
+        List<Long> similarUserIds = userRepository.getSimilarUsersByLikes(userId, count);
+        if (similarUserIds.isEmpty()) {
+            return Collections.emptyList();
+
+        }
+        return userRepository.getRecommendedFilms(similarUserIds, userId);
     }
 
 	public void deleteUser(Long userId) {
