@@ -67,6 +67,7 @@ public class ReviewController {
 
     @DeleteMapping("/{id}/dislike/{userId}")
     public void removeDislike(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Получен HTTP запрос на удаление дизлайка пользователем " + userId);
         reviewService.removeDislike(id, userId);
     }
 
