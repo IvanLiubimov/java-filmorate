@@ -45,4 +45,19 @@ public class FeedRepository {
                 .timestamp(rs.getTimestamp("timestamp").getTime())
                 .build();
     }
+
+    public boolean existsByUserAndEntityAndType(Long userId, Long entityId,
+                                                FeedEventType eventType, FeedEventOperation operation) {
+        String sql = "SELECT COUNT(*) FROM user_feeds " +
+                "WHERE user_id = ? AND entity_id = ? " +
+                "AND event_type = ? AND operation = ?";
+
+        Integer count = jdbcTemplate.queryForObject(
+                sql,
+                Integer.class,
+                userId, entityId, eventType.name(), operation.name()
+        );
+
+        return count != null && count > 0;
+    }
 }
