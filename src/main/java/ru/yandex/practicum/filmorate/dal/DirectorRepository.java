@@ -50,4 +50,10 @@ public class DirectorRepository extends BaseRepository<Director> {
         jdbcTemplate.update(query, id);
     }
 
+    public boolean directorExists(Long directorId) {
+        String sql = "SELECT COUNT(*) FROM directors WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, directorId);
+        return count != null && count > 0;
+    }
+
 }

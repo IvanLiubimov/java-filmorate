@@ -102,13 +102,6 @@ public class FilmController {
         return filmService.mostPopular(count, year, genreId);
     }
 
-    @GetMapping("/{id}/reviews")
-    public List<Review> getFilmReviews(
-            @PathVariable Long id,
-            @RequestParam(defaultValue = "10") int count) {
-        return reviewService.getByFilmId(id, count);
-    }
-
 	@DeleteMapping("{id}")
 	public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
 		log.info("Получен HTTP запрос на удаление фильма по id: {}", id);
