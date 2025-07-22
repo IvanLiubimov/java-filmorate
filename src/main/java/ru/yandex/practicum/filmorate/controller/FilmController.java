@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -87,7 +89,11 @@ public class FilmController {
     public Collection<Film> getPopularFilms(@RequestParam(defaultValue = "10") Integer count,
                                             @RequestParam(required = false) Integer year,
                                             @RequestParam(required = false) Integer genreId) {
-        return filmService.mostPopular(count, year, genreId);
+		try {
+			return filmService.mostPopular(count, year, genreId);
+		} catch (ConditionsNotMetException e) {
+			return Collections.emptyList();
+		}
     }
 
     @GetMapping("/{id}/reviews")

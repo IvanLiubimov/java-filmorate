@@ -49,15 +49,7 @@ public class FeedService {
     }
 
     public void addFriendEvent(Long userId, Long friendId, FeedEventOperation operation) {
-        // 1. Проверяем существование обоих пользователей
-        if (!userValidator.userExists(userId)) {
-            throw new NotFoundException("User not found");
-        }
-        if (!userValidator.userExists(friendId)) {
-            throw new NotFoundException("Friend not found");
-        }
-
-        // 2. Для REMOVE проверяем существование ADD
+		// Для REMOVE проверяем существование ADD
         if (operation == FeedEventOperation.REMOVE) {
             boolean hasAdd = feedRepository.existsByUserAndEntityAndType(
                     userId, friendId, FeedEventType.FRIEND, FeedEventOperation.ADD);

@@ -12,11 +12,11 @@ public class DirectorValidator {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    public void validate(Director director) {
-        if (director.getName() == null || director.getName().isBlank()) {
-            throw new ConditionsNotMetException("Название фильма не может быть пустым");
-        }
-    }
+	public void validate(Director director) {
+		if (director.getName() == null || director.getName().isBlank()) {
+			throw new ConditionsNotMetException("Название фильма не может быть пустым");
+		}
+	}
 
     public boolean directorExists(Long directorId) {
         String sql = "SELECT COUNT(*) FROM directors WHERE id = ?";

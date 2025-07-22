@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
@@ -18,7 +17,6 @@ import ru.yandex.practicum.filmorate.validator.DirectorValidator;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FilmService {
@@ -54,15 +52,27 @@ public class FilmService {
 	}
 
 	public Collection<Film> mostPopular(Integer count, Integer year, Integer genreId) {
+//		validateMostPopular (count, year, genreId);
 		return filmRepository.mostPopular(count, year, genreId);
 	}
+	
+//	private void validateMostPopular (Integer count, Integer year, Integer genreId) {
+//		if (count < 1) {
+//			throw new ConditionsNotMetException("Количество запрашиваемых фильмов count не может быть меньше 1. Полученное значениe count:" + count);
+//		}
+//		if (genreId < 1) {
+//			throw new ConditionsNotMetException("id-жанра фильма genreId не может быть меньше 1. Полученное значениe genreId:" + genreId);
+//		}
+//		if (year < 1895) {
+//			throw new ConditionsNotMetException("Значение года выпуска фильмов year не может быть меньше 1895. Полученное значениe year:" + year);
+//		}
+//	}
 
 	public Collection<Film> getAllFilms() {
 		return filmRepository.getAllFilms();
 	}
 
 	public Film createFilm(Film film) {
-		log.info("Вызван метод createFilm с фильмом: {}", film);
 		List<Genre> genresList = checkFilmHasDuplicatedGenres(film);
 		film.setGenres(genresList);
 		filmValidator.validate(film);
@@ -77,10 +87,15 @@ public class FilmService {
 	}
 
 	public void deleteFilm(Long filmId) {
+		if (!filmValidator.filmExists(filmId)) {
+			throw new NotFoundException("Фильм id:" + filmId + " не найден");
+		}
 		filmRepository.deleteFilm(filmId);
 	}
 
 	public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+		userValidator.userExists(userId);
+		userValidator.userExists(friendId);
 		return filmRepository.getCommonFilms(userId, friendId);
 	}
 
@@ -91,8 +106,6 @@ public class FilmService {
 	}
 
 	public List<Film> getFilmsByDirectorSortedByYears(long directorId) {
-		Director director = directorService.getDirectorById(directorId);
-		directorValidator.validate(director);
 		return filmRepository.getFilmsByDirectorSortedByYears(directorId);
 	}
 

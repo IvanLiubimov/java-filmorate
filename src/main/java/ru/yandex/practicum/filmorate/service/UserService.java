@@ -112,6 +112,7 @@ public class UserService {
     }
 
 	public void deleteUser(Long userId) {
+		userValidator.userExists(userId);
 		userRepository.deleteUser(userId);
 	}
 }
