@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -30,13 +31,13 @@ public class DirectorController {
     }
 
     @PostMapping // POST /directors - Создание режиссёра
-    public Director createDirector(@RequestBody Director director) {
+    public Director createDirector(@RequestBody @Valid Director director) {
         log.info("Получен HTTP запрос на создание режиссера: {}", director);
         return directorService.createDirector(director);
     }
 
     @PutMapping // PUT /directors - Изменение режиссёра
-    public Director updateDirector(@RequestBody Director newDirector) {
+    public Director updateDirector(@RequestBody @Valid Director newDirector) {
         log.info("Получен HTTP запрос на обновление режиссера: {}", newDirector);
         return directorService.updateDirector(newDirector);
     }

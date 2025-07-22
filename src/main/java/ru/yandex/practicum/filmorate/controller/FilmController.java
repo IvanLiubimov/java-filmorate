@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
@@ -94,13 +93,6 @@ public class FilmController {
 		} catch (ConditionsNotMetException e) {
 			return Collections.emptyList();
 		}
-    }
-
-    @GetMapping("/{id}/reviews")
-    public List<Review> getFilmReviews(
-            @PathVariable Long id,
-            @RequestParam(defaultValue = "10") int count) {
-        return reviewService.getByFilmId(id, count);
     }
 
 	@DeleteMapping("{id}")
