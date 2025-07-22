@@ -1,72 +1,72 @@
 ```mermaid
 erDiagram
     users {
-        INTEGER id PK
-        VARCHAR login
-        VARCHAR email
-        VARCHAR name
-        DATE birthday
+        id INTEGER
+        login VARCHAR
+        email VARCHAR
+        name VARCHAR
+        birthday DATE
     }
     films {
-        INTEGER id PK
-        VARCHAR name
-        VARCHAR description
-        DATE releaseDate
-        INTEGER duration
-        INTEGER rating_id FK
+        id INTEGER
+        name VARCHAR
+        description VARCHAR
+        releaseDate DATE
+        duration INTEGER
+        rating_id INTEGER
     }
     genres {
-        INTEGER genre_id PK
-        VARCHAR name
+        genre_id INTEGER
+        name VARCHAR
     }
     rating {
-        INTEGER id PK
-        VARCHAR name
+        id INTEGER
+        name VARCHAR
     }
     directors {
-        INTEGER id PK
-        VARCHAR name
+        id INTEGER
+        name VARCHAR
     }
     reviews {
-        INTEGER review_id PK
-        TEXT content
-        BOOLEAN is_positive
-        INTEGER user_id FK
-        INTEGER film_id FK
-        INTEGER useful
+        review_id INTEGER
+        content TEXT
+        is_positive BOOLEAN
+        user_id INTEGER
+        film_id INTEGER
+        useful INTEGER
     }
     review_ratings {
-        INTEGER review_id PK FK
-        INTEGER user_id PK FK
-        BOOLEAN is_positive
+        review_id INTEGER
+        user_id INTEGER
+        is_positive BOOLEAN
     }
     user_feeds {
-        INTEGER event_id PK
-        INTEGER user_id FK
-        VARCHAR event_type
-        VARCHAR operation
-        INTEGER entity_id
-        TIMESTAMP timestamp
+        event_id INTEGER
+        user_id INTEGER
+        event_type VARCHAR
+        operation VARCHAR
+        entity_id INTEGER
+        timestamp TIMESTAMP
     }
     film_likes {
-        INTEGER user_id FK
-        INTEGER film_id FK
+        user_id INTEGER
+        film_id INTEGER
     }
     favorite_films {
-        INTEGER user_id FK
-        INTEGER film_id FK
+        user_id INTEGER
+        film_id INTEGER
     }
     friendship {
-        INTEGER user_id FK
-        INTEGER friend_id FK
+        user_id INTEGER
+        friend_id INTEGER
     }
     films_genres {
-        INTEGER film_id FK
-        INTEGER genre_id FK
+        film_id INTEGER
+        genre_id INTEGER
     }
     films_directors {
-        INTEGER film_id FK
-        INTEGER director_id FK
+        film_id INTEGER
+        director_id INTEGER
     }
 
     users ||--o{ reviews : "writes"

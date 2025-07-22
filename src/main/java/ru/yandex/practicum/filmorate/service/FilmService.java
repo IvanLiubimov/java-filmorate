@@ -53,21 +53,8 @@ public class FilmService {
 	}
 
 	public Collection<Film> mostPopular(Integer count, Integer year, Integer genreId) {
-//		validateMostPopular (count, year, genreId);
 		return filmRepository.mostPopular(count, year, genreId);
 	}
-	
-//	private void validateMostPopular (Integer count, Integer year, Integer genreId) {
-//		if (count < 1) {
-//			throw new ConditionsNotMetException("Количество запрашиваемых фильмов count не может быть меньше 1. Полученное значениe count:" + count);
-//		}
-//		if (genreId < 1) {
-//			throw new ConditionsNotMetException("id-жанра фильма genreId не может быть меньше 1. Полученное значениe genreId:" + genreId);
-//		}
-//		if (year < 1895) {
-//			throw new ConditionsNotMetException("Значение года выпуска фильмов year не может быть меньше 1895. Полученное значениe year:" + year);
-//		}
-//	}
 
 	public Collection<Film> getAllFilms() {
 		return filmRepository.getAllFilms();
