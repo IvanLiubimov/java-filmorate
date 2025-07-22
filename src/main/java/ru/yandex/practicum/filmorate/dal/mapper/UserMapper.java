@@ -22,8 +22,8 @@ public class UserMapper implements RowMapper<User> {
 
         return User.builder()
                 .id(userId)
-                .login(email)
-                .email(login)
+                .login(login)
+                .email(email)
                 .name(name)
                 .birthday(birthday)
                 .build();

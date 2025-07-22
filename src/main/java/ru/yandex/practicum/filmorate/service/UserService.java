@@ -1,15 +1,20 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.dal.UserRepository;
+import ru.yandex.practicum.filmorate.model.enums.FeedEventOperation;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
-
-import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +22,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserValidator userValidator;
     protected final JdbcTemplate jdbcTemplate;
+    private final FeedService feedService;
 
 
     public void addFriend(Long id, long friendId) {
@@ -32,6 +38,7 @@ public class UserService {
             throw new NotFoundException("Пользователь с id " + friendId + " не найден.");
         }
         userRepository.addFriend(id, friendId);
+        feedService.addFriendEvent(id, friendId, FeedEventOperation.ADD);
     }
 
     public void deleteFriend(Long id, long friendId) {
@@ -45,6 +52,7 @@ public class UserService {
             throw new NotFoundException("Пользователь с id=" + friendId + " не найден");
         }
         userRepository.deleteFriend(id, friendId);
+        feedService.addFriendEvent(id, friendId, FeedEventOperation.REMOVE);
     }
 
     public Collection<User> showMutualFriends(Long id, long friendId) {
@@ -69,7 +77,6 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("Фильм с id " + userId + " не найден."));
     }
 
-
     public User createUser(User user) {
         userValidator.validate(user);
         if (isEmailExists(user.getEmail())) {
@@ -77,7 +84,6 @@ public class UserService {
         }
         return userRepository.createUser(user);
     }
-
 
     public User editUser(User newUser) {
         userValidator.validate(newUser);
@@ -101,7 +107,18 @@ public class UserService {
         return count != null && count > 0;
     }
 
+    public Collection<Film> getRecommendedFilms(long userId, int count) {
+        userValidator.userExists(userId);
+        List<Long> similarUserIds = userRepository.getSimilarUsersByLikes(userId, count);
+        if (similarUserIds.isEmpty()) {
+            return Collections.emptyList();
 
+        }
+        return userRepository.getRecommendedFilms(similarUserIds, userId);
+    }
 
+	public void deleteUser(Long userId) {
+		userValidator.userExists(userId);
+		userRepository.deleteUser(userId);
+	}
 }
-
