@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -129,11 +130,17 @@ public class FilmService {
 	}
 
 	public List<Film> searchFilms(String query, String by) {
-		if (by.equals("director")) {
+
+		List<String> search = Arrays.asList(by.split(","));
+		String title = "title";
+		String director = "director";
+		
+
+		if (search.size() == 1 && search.contains(director)) {
 			return getFilmByDirector(query);
-		} else if (by.equals("title")) {
+		} else 	if (search.size() == 1 && search.contains(title)) {
 			return getFilmByTitle(query);
-		} else if (by.equals("title,director") || by.equals("director,title")) {
+		} else if (search.size() == 2 && search.contains(title) && search.contains(director)) {
 			return searchAll(query);
 		} else {
 			throw new ConditionsNotMetException("Неверные параметры поиска");
