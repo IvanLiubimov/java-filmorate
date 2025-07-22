@@ -48,5 +48,4 @@ public class DirectorController {
         directorService.deleteDirector(id);
         return ResponseEntity.ok().build();
     }
-
 }
