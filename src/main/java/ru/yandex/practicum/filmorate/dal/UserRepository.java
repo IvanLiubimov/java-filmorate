@@ -1,10 +1,7 @@
 package ru.yandex.practicum.filmorate.dal;
 
 import java.sql.Date;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -132,8 +129,7 @@ public class UserRepository extends BaseRepository<User> {
 		return jdbcTemplate.queryForObject(isUserExistsSql, Boolean.class);
 	}
 
-    public Collection<Film> getRecommendedFilms(long userId) {
-        // 1. Находим пользователей с максимальным пересечением по лайкам
+    public List<Long> getSimilarUsersByLikes(long userId, int count) {
         String similarUsersQuery = "SELECT fl2.user_id AS similar_user_id, " +
                 "COUNT(*) AS common_likes_count " +
                 "FROM film_likes fl1 " +
@@ -141,46 +137,51 @@ public class UserRepository extends BaseRepository<User> {
                 "WHERE fl1.user_id = ? " +
                 "GROUP BY fl2.user_id " +
                 "ORDER BY common_likes_count DESC " +
-                "LIMIT 1";
+                "LIMIT ?";
 
-        // 2. Если нет пользователей с общими лайками, возвращаем null (обработаем в сервисе)
         List<Long> similarUserIds = jdbcTemplate.query(
                 similarUsersQuery,
                 (rs, rowNum) -> rs.getLong("similar_user_id"),
-                userId
+                userId, count
         );
 
-        if (similarUserIds.isEmpty()) {
-            return Collections.emptyList();
-        }
+       return similarUserIds;
+    }
 
-        long similarUserId = similarUserIds.get(0);
+    public Collection<Film> getRecommendedFilms(List<Long> similarUserIds, long userId) {
 
-        // 3. Находим фильмы, которые понравились похожему пользователю, но не текущему
-        String recommendedFilmsQuery = """
-                SELECT f.*,
-                       fg.genre_id,
-                       g.name AS genre_name,
-                       fl.user_id AS like_user_id,
-                       r.name AS rating_name,
-                       fdir.director_id,
-                       dir.name AS director_name
-                FROM films f
-                LEFT JOIN films_genres fg ON f.id = fg.film_id
-                LEFT JOIN genres g ON fg.genre_id = g.genre_id
-                LEFT JOIN rating r ON f.rating_id = r.id
-                LEFT JOIN film_likes fl ON f.id = fl.film_id
-                LEFT JOIN films_directors fdir ON f.id = fdir.film_id
-                LEFT JOIN directors dir ON fdir.director_id = dir.id
-                WHERE f.id IN (
-                    SELECT film_id
-                    FROM film_likes
-                    WHERE user_id = ?
-                      AND film_id NOT IN (
-                          SELECT film_id FROM film_likes WHERE user_id = ?
-                      )
-                )""";
-        return jdbcTemplate.query(recommendedFilmsQuery, new FilmResultSetExtractor(), similarUserId, userId);
+        String inSql = String.join(",", Collections.nCopies(similarUserIds.size(), "?"));
+
+        String recommendedFilmsQuery = String.format("""
+        SELECT f.*,
+               fg.genre_id,
+               g.name AS genre_name,
+               fl.user_id AS like_user_id,
+               r.name AS rating_name,
+               fdir.director_id,
+               dir.name AS director_name
+        FROM films f
+        LEFT JOIN films_genres fg ON f.id = fg.film_id
+        LEFT JOIN genres g ON fg.genre_id = g.genre_id
+        LEFT JOIN rating r ON f.rating_id = r.id
+        LEFT JOIN film_likes fl ON f.id = fl.film_id
+        LEFT JOIN films_directors fdir ON f.id = fdir.film_id
+        LEFT JOIN directors dir ON fdir.director_id = dir.id
+        WHERE f.id IN (
+            SELECT DISTINCT film_id
+            FROM film_likes
+            WHERE user_id IN (%s)
+              AND film_id NOT IN (
+                  SELECT film_id FROM film_likes WHERE user_id = ?
+              )
+        )
+    """, inSql);
+
+        List<Object> params = new ArrayList<>(similarUserIds);
+        params.add(userId);
+
+        return jdbcTemplate.query(recommendedFilmsQuery, new FilmResultSetExtractor(), params.toArray());
     }
 }
+
 

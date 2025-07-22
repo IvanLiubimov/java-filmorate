@@ -2,8 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import java.util.Collection;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -19,9 +17,6 @@ import ru.yandex.practicum.filmorate.validator.UserValidator;
 public class FeedService {
     private final FeedRepository feedRepository;
     private final UserValidator userValidator;
-    private final Logger log = LoggerFactory.getLogger(FeedService.class);
-
-
 
    public Collection<FeedEvent> getUserFeed(Long userId) {
        if (!userValidator.userExists(userId)) {
@@ -54,15 +49,7 @@ public class FeedService {
     }
 
     public void addFriendEvent(Long userId, Long friendId, FeedEventOperation operation) {
-        // 1. Проверяем существование обоих пользователей
-        if (!userValidator.userExists(userId)) {
-            throw new NotFoundException("User not found");
-        }
-        if (!userValidator.userExists(friendId)) {
-            throw new NotFoundException("Friend not found");
-        }
-
-        // 2. Для REMOVE проверяем существование ADD
+		// Для REMOVE проверяем существование ADD
         if (operation == FeedEventOperation.REMOVE) {
             boolean hasAdd = feedRepository.existsByUserAndEntityAndType(
                     userId, friendId, FeedEventType.FRIEND, FeedEventOperation.ADD);

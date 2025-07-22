@@ -1,10 +1,11 @@
 package ru.yandex.practicum.filmorate.handler;
 
-import jakarta.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import jakarta.validation.ValidationException;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.ErrorResponse;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
@@ -50,13 +51,4 @@ public class GlobalExceptionHandler {
                 .error("Internal server error") // Не показываем детали клиенту
                 .build();
     }
-
-   /* @ExceptionHandler(ReviewNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleReviewNotFound(ReviewNotFoundException ex) {
-        return ErrorResponse.builder()
-                .errorCode(HttpStatus.NOT_FOUND.value())
-                .error(ex.getMessage())
-                .build();
-    }*/
 }

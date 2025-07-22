@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -51,7 +52,7 @@ public class ReviewRepository implements ReviewStorage {
                 review.getReviewId());
 
 
-        return getById(review.getReviewId());
+        return getById(review.getReviewId()).orElseThrow();
     }
 
     @Override
@@ -61,12 +62,16 @@ public class ReviewRepository implements ReviewStorage {
     }
 
     @Override
-    public Review getById(Long id) {
+    public Optional<Review> getById(Long id) {
         String sql = "SELECT r.*, " +
                 "(SELECT COALESCE(SUM(CASE WHEN rr.is_positive THEN 1 ELSE -1 END), 0) " +
                 "FROM review_ratings rr WHERE rr.review_id = r.review_id) AS useful " +
                 "FROM reviews r WHERE r.review_id = ?";
-        return jdbcTemplate.queryForObject(sql, this::mapRowToReview, id);
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, this::mapRowToReview, id));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
 
@@ -82,8 +87,6 @@ public class ReviewRepository implements ReviewStorage {
 
     @Override
     public void addLike(Long reviewId, Long userId) {
-        // Удаляем возможный дизлайк перед добавлением лайка
-        removeDislike(reviewId, userId);
 
         String sql = "MERGE INTO review_ratings (review_id, user_id, is_positive) " +
                 "KEY (review_id, user_id) VALUES (?, ?, true)";
@@ -94,8 +97,6 @@ public class ReviewRepository implements ReviewStorage {
 
     @Override
     public void addDislike(Long reviewId, Long userId) {
-        // Удаляем возможный лайк перед добавлением дизлайка
-        removeLike(reviewId, userId);
 
         String sql = "MERGE INTO review_ratings (review_id, user_id, is_positive) " +
                 "KEY (review_id, user_id) VALUES (?, ?, false)";

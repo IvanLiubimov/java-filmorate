@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
@@ -46,25 +46,14 @@ public class FilmController {
     public List<Film> searchFilms(
             @RequestParam String query,
             @RequestParam(defaultValue = "title") String by) {
-        if (by.equals("director")) {
-            return filmService.getFilmByDirector(query);
-        } else if (by.equals("title")) {
-            return filmService.getFilmByTitle(query);
-        } else if (by.equals("title,director") || by.equals("director,title")) {
-            return filmService.searchAll(query);
-        } else {
-            throw new ConditionsNotMetException("Неверные параметры поиска");
-        }
+		return filmService.searchFilms(query, by);
     }
 
     @GetMapping("/director/{directorId}")
     public Collection<Film> getFilmsByDirector(
-            @PathVariable long directorId,
+			@PathVariable Long directorId,
             @RequestParam(defaultValue = "year") String sortBy) {
-        if (sortBy.equals("year")) {
-            return filmService.getFilmsByDirectorSortedByYears(directorId);
-        }
-        return filmService.getFilmsByDirectorSortedByLikes(directorId);
+		return filmService.getFilmsByDirector(directorId, sortBy);
     }
 
     @PostMapping
@@ -99,14 +88,11 @@ public class FilmController {
     public Collection<Film> getPopularFilms(@RequestParam(defaultValue = "10") Integer count,
                                             @RequestParam(required = false) Integer year,
                                             @RequestParam(required = false) Integer genreId) {
-        return filmService.mostPopular(count, year, genreId);
-    }
-
-    @GetMapping("/{id}/reviews")
-    public List<Review> getFilmReviews(
-            @PathVariable Long id,
-            @RequestParam(defaultValue = "10") int count) {
-        return reviewService.getByFilmId(id, count);
+		try {
+			return filmService.mostPopular(count, year, genreId);
+		} catch (ConditionsNotMetException e) {
+			return Collections.emptyList();
+		}
     }
 
 	@DeleteMapping("{id}")
