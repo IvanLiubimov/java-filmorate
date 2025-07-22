@@ -1,13 +1,13 @@
 ```mermaid
 erDiagram
-    USERS {
+    users {
         INTEGER id PK
         VARCHAR login
         VARCHAR email
         VARCHAR name
         DATE birthday
     }
-    FILMS {
+    films {
         INTEGER id PK
         VARCHAR name
         VARCHAR description
@@ -15,19 +15,19 @@ erDiagram
         INTEGER duration
         INTEGER rating_id FK
     }
-    GENRES {
+    genres {
         INTEGER genre_id PK
         VARCHAR name
     }
-    DIRECTORS {
+    rating {
         INTEGER id PK
         VARCHAR name
     }
-    RATINGS {
+    directors {
         INTEGER id PK
         VARCHAR name
     }
-    REVIEWS {
+    reviews {
         INTEGER review_id PK
         TEXT content
         BOOLEAN is_positive
@@ -35,12 +35,12 @@ erDiagram
         INTEGER film_id FK
         INTEGER useful
     }
-    REVIEW_RATINGS {
+    review_ratings {
         INTEGER review_id PK FK
         INTEGER user_id PK FK
         BOOLEAN is_positive
     }
-    USER_FEEDS {
+    user_feeds {
         INTEGER event_id PK
         INTEGER user_id FK
         VARCHAR event_type
@@ -48,36 +48,41 @@ erDiagram
         INTEGER entity_id
         TIMESTAMP timestamp
     }
-    FILMS_GENRES {
-        INTEGER film_id FK
-        INTEGER genre_id FK
-    }
-    FILMS_DIRECTORS {
-        INTEGER film_id FK
-        INTEGER director_id FK
-    }
-    FILM_LIKES {
+    film_likes {
         INTEGER user_id FK
         INTEGER film_id FK
     }
-    FAVORITE_FILMS {
+    favorite_films {
         INTEGER user_id FK
         INTEGER film_id FK
     }
-    FRIENDSHIP {
+    friendship {
         INTEGER user_id FK
         INTEGER friend_id FK
     }
-    
-    USERS ||--o{ REVIEWS : "writes"
-    USERS ||--o{ REVIEW_RATINGS : "rates"
-    USERS ||--o{ FILM_LIKES : "likes"
-    USERS ||--o{ FAVORITE_FILMS : "favorites"
-    USERS ||--o{ FRIENDSHIP : "friends"
-    FILMS ||--o{ REVIEWS : "reviews"
-    FILMS ||--o{ FILMS_GENRES : "has genres"
-    GENRES ||--o{ FILMS_GENRES : "genres of"
-    FILMS ||--o{ FILMS_DIRECTORS : "has directors"
-    DIRECTORS ||--o{ FILMS_DIRECTORS : "directs"
-    RATINGS ||--o{ FILMS : "rated as"
+    films_genres {
+        INTEGER film_id FK
+        INTEGER genre_id FK
+    }
+    films_directors {
+        INTEGER film_id FK
+        INTEGER director_id FK
+    }
+
+    users ||--o{ reviews : "writes"
+    users ||--o{ review_ratings : "rates"
+    users ||--o{ film_likes : "likes"
+    users ||--o{ favorite_films : "favorites"
+    users ||--o{ friendship : "friends"
+    users }|--|| user_feeds : "triggers"
+
+    films ||--o{ reviews : "has reviews"
+    films ||--o{ films_genres : "has genres"
+    films ||--o{ films_directors : "has directors"
+    genres ||--o{ films_genres : "genres of"
+    directors ||--o{ films_directors : "directs"
+
+    rating ||--o{ films : "rated as"
+
+    reviews ||--o{ review_ratings : "ratings"
 ```

@@ -134,7 +134,6 @@ public class FilmService {
 		List<String> search = Arrays.asList(by.split(","));
 		String title = "title";
 		String director = "director";
-		
 
 		if (search.size() == 1 && search.contains(director)) {
 			return getFilmByDirector(query);
